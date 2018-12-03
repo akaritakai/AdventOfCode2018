@@ -2,7 +2,6 @@ package net.akaritakai.aoc2018;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Problem1 extends AbstractProblem {
@@ -13,17 +12,17 @@ public class Problem1 extends AbstractProblem {
 
     @Override
     public String solvePart1() {
-        final long sum = getInputNumbers().stream().mapToLong(i -> i).sum();
+        final var sum = getInputNumbers().stream().mapToLong(i -> i).sum();
         return String.valueOf(sum);
     }
 
     @Override
     public String solvePart2() {
-        final List<Long> inputs = getInputNumbers();
-        final Set<Long> sums = new HashSet<>();
+        final var inputs = getInputNumbers();
+        final var sums = new HashSet<>();
         long sum = 0;
         while (true) {
-            for (long input : inputs) {
+            for (final var input : inputs) {
                 sum += input;
                 if (!sums.add(sum)) {
                     return String.valueOf(sum);

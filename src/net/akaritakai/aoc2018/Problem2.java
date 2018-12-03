@@ -15,10 +15,10 @@ public class Problem2 extends AbstractProblem {
 
     @Override
     public String solvePart1() {
-        long twoCount = 0;
-        long threeCount = 0;
+        var twoCount = 0;
+        var threeCount = 0;
 
-        for (String input : getInputs()) {
+        for (final var input : getInputs()) {
             if (characterAppearsNTimes(input, 2)) {
                 twoCount++;
             }
@@ -27,16 +27,16 @@ public class Problem2 extends AbstractProblem {
             }
         }
 
-        long checksum = twoCount * threeCount;
+        final var checksum = twoCount * threeCount;
         return String.valueOf(checksum);
     }
 
     @Override
     public String solvePart2() {
-        for (String input1 : getInputs()) {
-            for (String input2 : getInputs()) {
+        for (final var input1 : getInputs()) {
+            for (final var input2 : getInputs()) {
                 assert(input1.length() == input2.length());
-                String common = getCommonCharacters(input1, input2);
+                final var common = getCommonCharacters(input1, input2);
                 if (common.length() == input1.length() - 1) {
                     return common;
                 }
@@ -60,10 +60,10 @@ public class Problem2 extends AbstractProblem {
 
     private String getCommonCharacters(@NotNull final String s1, @NotNull final String s2) {
         assert(s1.length() == s2.length());
-        final StringBuilder similar = new StringBuilder();
-        for (int i = 0; i < s1.length(); i++) {
-            char c1 = s1.charAt(i);
-            char c2 = s2.charAt(i);
+        final var similar = new StringBuilder();
+        for (var i = 0; i < s1.length(); i++) {
+            final var c1 = s1.charAt(i);
+            final var c2 = s2.charAt(i);
             if (c1 == c2) {
                 similar.append(c1);
             }

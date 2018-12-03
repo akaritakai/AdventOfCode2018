@@ -17,7 +17,7 @@ public class Problem3 extends AbstractProblem {
 
     @Override
     public String solvePart1() {
-        long count = getClaims().stream()
+        final var count = getClaims().stream()
                 .flatMap(claim -> claim.getPoints().stream())
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .values().stream()
@@ -53,10 +53,10 @@ public class Problem3 extends AbstractProblem {
             this.rectangle = rectangle;
         }
 
-        Set<Point> getPoints() {
-            final Set<Point> points = new HashSet<>();
-            for (int x = 0; x < rectangle.width; x++) {
-                for (int y = 0; y < rectangle.height; y++) {
+        List<Point> getPoints() {
+            final List<Point> points = new ArrayList<>();
+            for (var x = 0; x < rectangle.width; x++) {
+                for (var y = 0; y < rectangle.height; y++) {
                     points.add(new Point(rectangle.x + x, rectangle.y + y));
                 }
             }
@@ -65,11 +65,11 @@ public class Problem3 extends AbstractProblem {
 
         static Claim fromString(@NotNull final String s) {
             @RegExp final String regex = "^#(\\d+) @ (\\d+),(\\d+): (\\d+)x(\\d+)$";
-            final int id = Integer.parseInt(s.replaceAll(regex, "$1"));
-            final int x = Integer.parseInt(s.replaceAll(regex, "$2"));
-            final int y = Integer.parseInt(s.replaceAll(regex, "$3"));
-            final int width = Integer.parseInt(s.replaceAll(regex, "$4"));
-            final int height = Integer.parseInt(s.replaceAll(regex, "$5"));
+            final var id = Integer.parseInt(s.replaceAll(regex, "$1"));
+            final var x = Integer.parseInt(s.replaceAll(regex, "$2"));
+            final var y = Integer.parseInt(s.replaceAll(regex, "$3"));
+            final var width = Integer.parseInt(s.replaceAll(regex, "$4"));
+            final var height = Integer.parseInt(s.replaceAll(regex, "$5"));
             return new Claim(id, new Rectangle(x, y, width, height));
         }
 

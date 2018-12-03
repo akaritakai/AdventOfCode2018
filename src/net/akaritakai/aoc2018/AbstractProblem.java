@@ -19,7 +19,7 @@ public abstract class AbstractProblem {
      * The day number of the puzzle
      * @return the day number of the puzzle
      */
-    protected abstract int getDay();
+    public abstract int getDay();
 
     /**
      * Returns the solution to part 1 of the problem
