@@ -4,7 +4,9 @@ import java.util.List;
 
 public class Main {
 
-    private static final List<AbstractProblem> PROBLEMS = List.of();
+    private static final List<AbstractProblem> PROBLEMS = List.of(
+            new Problem1()
+    );
 
     public static void main(String[] args) {
         PROBLEMS.forEach(problem -> {
