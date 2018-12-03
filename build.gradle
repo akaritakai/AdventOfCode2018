@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+mainClassName = "net.akaritakai.aoc2018.Main"
+sourceSets.main.java.srcDirs = ['src']
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains:annotations:+"
+}
