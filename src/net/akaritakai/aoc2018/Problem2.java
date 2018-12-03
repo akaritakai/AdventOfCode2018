@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class Problem2 extends AbstractProblem {
     @Override
-    protected int getDay() {
+    public int getDay() {
         return 2;
     }
 

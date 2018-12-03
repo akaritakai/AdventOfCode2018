@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Problem1 extends AbstractProblem {
     @Override
-    protected int getDay() {
+    public int getDay() {
         return 1;
     }
 

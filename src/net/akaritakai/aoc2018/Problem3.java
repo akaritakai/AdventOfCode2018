@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class Problem3 extends AbstractProblem {
     @Override
-    protected int getDay() {
+    public int getDay() {
         return 3;
     }
 
