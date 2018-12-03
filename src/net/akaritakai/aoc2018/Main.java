@@ -5,7 +5,8 @@ import java.util.List;
 public class Main {
 
     private static final List<AbstractProblem> PROBLEMS = List.of(
-            new Problem1()
+            new Problem1(),
+            new Problem2()
     );
 
     public static void main(String[] args) {
