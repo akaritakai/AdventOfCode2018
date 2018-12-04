@@ -3,6 +3,7 @@ package net.akaritakai.aoc2018;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.intellij.lang.annotations.RegExp;
 
@@ -15,43 +16,43 @@ public class Problem4 extends AbstractProblem {
 
   @Override
   public String solvePart1() {
-    var schedule = processInput();
+    final var schedule = processInput();
 
     // Strategy #1: Sleepiest guard is the one who sleeps the most over all the minutes
-    var sleepiestGuard = schedule.entrySet()
+    final var sleepiestGuard = schedule.entrySet()
         .stream()
         .max(Comparator.comparingLong(e -> e.getValue().values().stream().mapToInt(i -> i).sum()))
         .map(Map.Entry::getKey)
         .orElse(-1);
-    var sleepiestMinute = schedule.get(sleepiestGuard)
+    final var sleepiestMinute = schedule.get(sleepiestGuard)
         .entrySet()
         .stream()
         .max(Comparator.comparingLong(Map.Entry::getValue))
         .map(Map.Entry::getKey)
         .orElse(-1);
 
-    var checksum = sleepiestGuard * sleepiestMinute;
+    final var checksum = sleepiestGuard * sleepiestMinute;
     return String.valueOf(checksum);
   }
 
   @Override
   public String solvePart2() {
-    var schedule = processInput();
+    final var schedule = processInput();
 
     // Strategy #2: Sleepiest guard is the one who sleeps the most in any minute
-    var sleepiestGuard = schedule.entrySet()
+    final var sleepiestGuard = schedule.entrySet()
         .stream()
         .max(Comparator.comparingInt(e -> e.getValue().values().stream().max(Integer::compare).orElse(-1)))
         .map(Map.Entry::getKey)
         .orElse(-1);
-    var sleepiestMinute = schedule.get(sleepiestGuard)
+    final var sleepiestMinute = schedule.get(sleepiestGuard)
         .entrySet()
         .stream()
         .max(Comparator.comparingInt(Map.Entry::getValue))
         .map(Map.Entry::getKey)
         .orElse(-1);
 
-    var checksum = sleepiestGuard * sleepiestMinute;
+    final var checksum = sleepiestGuard * sleepiestMinute;
     return String.valueOf(checksum);
   }
 
@@ -78,8 +79,7 @@ public class Problem4 extends AbstractProblem {
         @RegExp final var regex = "^\\[\\d+-\\d+-\\d+ \\d+:(\\d+)] wakes up";
         final var wokeUp = Integer.parseInt(line.replaceAll(regex, "$1"));
         for (var minute = startedSleeping; minute < wokeUp; minute++) {
-          schedule.computeIfAbsent(guard, s -> new HashMap<>())
-              .compute(minute, (k, v) -> (v == null) ? 1 : v + 1);
+          schedule.computeIfAbsent(guard, s -> new HashMap<>()).compute(minute, VALUE_ACCUMULATOR);
         }
       }
     }
@@ -87,6 +87,11 @@ public class Problem4 extends AbstractProblem {
     return schedule;
   }
 
+  /**
+   * For use in Map.compute():
+   * If the value doesn't exist, set it to 1, otherwise increment it by 1.
+   */
+  private static final BiFunction<Integer, Integer, Integer> VALUE_ACCUMULATOR = (k, v) -> (v == null) ? 1 : v + 1;
 
 
 }
