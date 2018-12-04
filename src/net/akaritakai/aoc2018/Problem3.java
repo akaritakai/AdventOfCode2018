@@ -32,7 +32,7 @@ public class Problem3 extends AbstractProblem {
                 .filter(claim1 -> getClaims().parallelStream()
                         .filter(claim2 -> claim1.id != claim2.id)
                         .noneMatch(claim2 -> claim1.rectangle.intersects(claim2.rectangle)))
-                .findFirst()
+                .findAny()
                 .map(claim -> String.valueOf(claim.id))
                 .orElse(null);
     }

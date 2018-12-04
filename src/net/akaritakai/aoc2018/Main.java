@@ -7,7 +7,8 @@ public class Main {
     private static final List<AbstractProblem> PROBLEMS = List.of(
             new Problem1(),
             new Problem2(),
-            new Problem3()
+            new Problem3(),
+            new Problem4()
     );
 
     public static void main(String[] args) {
