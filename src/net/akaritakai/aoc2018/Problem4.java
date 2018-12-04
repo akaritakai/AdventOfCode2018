@@ -17,11 +17,10 @@ public class Problem4 extends AbstractProblem {
   public String solvePart1() {
     var schedule = processInput();
 
+    // Strategy #1: Sleepiest guard is the one who sleeps the most over all the minutes
     var sleepiestGuard = schedule.entrySet()
         .stream()
-        .max((e1, e2) -> Long.compare(
-          e1.getValue().values().stream().mapToInt(i -> i).sum(),
-          e2.getValue().values().stream().mapToInt(i -> i).sum()))
+        .max(Comparator.comparingLong(e -> e.getValue().values().stream().mapToInt(i -> i).sum()))
         .map(Map.Entry::getKey)
         .orElse(-1);
     var sleepiestMinute = schedule.get(sleepiestGuard)
@@ -39,13 +38,10 @@ public class Problem4 extends AbstractProblem {
   public String solvePart2() {
     var schedule = processInput();
 
+    // Strategy #2: Sleepiest guard is the one who sleeps the most in any minute
     var sleepiestGuard = schedule.entrySet()
         .stream()
-        .max(Comparator.comparingInt(e -> e.getValue()
-            .values()
-            .stream()
-            .max(Integer::compare)
-            .orElse(-1)))
+        .max(Comparator.comparingInt(e -> e.getValue().values().stream().max(Integer::compare).orElse(-1)))
         .map(Map.Entry::getKey)
         .orElse(-1);
     var sleepiestMinute = schedule.get(sleepiestGuard)
@@ -65,10 +61,11 @@ public class Problem4 extends AbstractProblem {
    */
   private Map<Integer, Map<Integer, Integer>>  processInput() {
     final Map<Integer, Map<Integer, Integer>> schedule =  new HashMap<>();
+    final var lines = getPuzzleInput().lines().sorted().collect(Collectors.toList());
 
     int guard = -1;
     int startedSleeping = -1;
-    for (String line : getPuzzleInput().lines().sorted().collect(Collectors.toList())) {
+    for (final String line : lines) {
       if (line.contains("begins shift")) {
         @RegExp final var regex = "^\\[\\d+-\\d+-\\d+ \\d+:\\d+] Guard #(\\d+) begins shift$";
         guard = Integer.parseInt(line.replaceAll(regex, "$1"));
