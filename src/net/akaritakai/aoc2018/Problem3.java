@@ -32,7 +32,8 @@ public class Problem3 extends AbstractProblem {
         final var candidateClaims = getClaims();
 
         // Speed-up: Test for overlaps within quadrants and remove any matches from our list of candidates
-        final var overlappingClaims = subDivideClaimArea(candidateClaims)
+        final var claimArea = getClaimArea(candidateClaims);
+        final var overlappingClaims = divideIntoQuadrants(claimArea)
                 .parallelStream()
                 .flatMap(region -> getOverlappingClaims(candidateClaims, region).stream())
                 .collect(Collectors.toSet());
@@ -50,9 +51,9 @@ public class Problem3 extends AbstractProblem {
     }
 
     /**
-     * Divides the claim area into quadrants based on the claims provided
+     * Determine the claim area based on the claims provided
      */
-    private List<Rectangle> subDivideClaimArea(final Set<Claim> claims) {
+    private Rectangle getClaimArea(final Set<Claim> claims) {
         final var maxWidth = claims.stream()
                 .map(claim -> claim.rectangle.x + claim.rectangle.width)
                 .max(Integer::compare)
@@ -63,7 +64,7 @@ public class Problem3 extends AbstractProblem {
                 .max(Integer::compare)
                 .orElse(-1);
 
-        return divideIntoQuadrants(new Rectangle(0, 0, maxWidth, maxHeight));
+        return new Rectangle(0, 0, maxWidth, maxHeight);
     }
 
     /**
