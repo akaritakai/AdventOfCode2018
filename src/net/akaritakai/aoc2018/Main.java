@@ -8,7 +8,8 @@ public class Main {
             new Problem1(),
             new Problem2(),
             new Problem3(),
-            new Problem4()
+            new Problem4(),
+            new Problem5()
     );
 
     public static void main(String[] args) {
