@@ -78,7 +78,7 @@ public class Problem3 extends AbstractProblem {
     }
 
     /**
-     * Gets the claims in the region bound by the given rectangle and find the non-overlapping claims
+     * Gets the claims in the region bound by the given rectangle and find the overlapping claims
      */
     private Set<Claim> getOverlappingClaims(@NotNull final Set<Claim> claims, @NotNull final Rectangle region) {
         final var subClaims = claims.parallelStream()
