@@ -34,7 +34,7 @@ public class PuzzleInputFetcher {
                     .header("cookie", "session=" + INSTANCE._sessionToken)
                     .GET()
                     .build();
-            final var puzzle = client.send(request, BodyHandlers.ofString()).body();
+            final var puzzle = client.send(request, BodyHandlers.ofString()).body().trim();
 
             // Store the puzzle locally
             Files.writeString(cachedPuzzle, puzzle);
@@ -44,7 +44,6 @@ public class PuzzleInputFetcher {
             throw new RuntimeException("Couldn't get puzzle input for day " + day);
         }
     }
-
 
     private static String getSessionData() {
         try {

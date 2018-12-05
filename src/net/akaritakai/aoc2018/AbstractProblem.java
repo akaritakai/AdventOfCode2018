@@ -1,5 +1,8 @@
 package net.akaritakai.aoc2018;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public abstract class AbstractProblem {
 
     private volatile String _puzzleInput;
@@ -13,6 +16,27 @@ public abstract class AbstractProblem {
             _puzzleInput = PuzzleInputFetcher.getPuzzleInput(getDay());
         }
         return _puzzleInput;
+    }
+
+    /**
+     * Gets the puzzle input for this day's problem as a list of lines
+     * @return the puzzle input for this day's problem as a list of lines
+     */
+    protected List<String> getPuzzleInputLines() {
+        return getPuzzleInput()
+                .lines()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets the puzzle input for this day's problem as a list of numbers
+     * @return the puzzle input for this day's problem as a list of numbers
+     */
+    protected List<Long> getPuzzleInputNumbers() {
+        return getPuzzleInput()
+                .lines()
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -13,14 +13,14 @@ public class Problem5 extends AbstractProblem {
 
   @Override
   public String solvePart1() {
-    return String.valueOf(reduce(getPolymer()).length());
+    return String.valueOf(reduce(getPuzzleInput()).length());
   }
 
   @Override
   public String solvePart2() {
     final var polymerLength = IntStream.rangeClosed('a', 'z')
         .parallel()
-        .mapToObj(c -> removeType(getPolymer(), (char) c))
+        .mapToObj(c -> removeType(getPuzzleInput(), (char) c))
         .mapToInt(s -> reduce(s).length())
         .min()
         .orElse(-1);
@@ -61,9 +61,4 @@ public class Problem5 extends AbstractProblem {
       REACTION_PAIR.add("" + upper + lower);
     }
   }
-
-  private String getPolymer() {
-    return getPuzzleInput().trim();
-  }
-
 }

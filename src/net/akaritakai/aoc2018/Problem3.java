@@ -38,8 +38,8 @@ public class Problem3 extends AbstractProblem {
     }
 
     private List<Claim> getClaims() {
-        return getPuzzleInput()
-                .lines()
+        return getPuzzleInputLines()
+                .stream()
                 .map(Claim::fromString)
                 .collect(Collectors.toList());
     }

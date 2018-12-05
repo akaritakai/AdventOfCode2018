@@ -62,7 +62,7 @@ public class Problem4 extends AbstractProblem {
    */
   private Map<Integer, Map<Integer, Integer>>  processInput() {
     final Map<Integer, Map<Integer, Integer>> schedule =  new HashMap<>();
-    final var lines = getPuzzleInput().lines().sorted().collect(Collectors.toList());
+    final var lines = getPuzzleInputLines().stream().sorted().collect(Collectors.toList());
 
     int guard = -1;
     int startedSleeping = -1;

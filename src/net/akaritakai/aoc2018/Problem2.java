@@ -2,7 +2,6 @@ package net.akaritakai.aoc2018;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -18,7 +17,7 @@ public class Problem2 extends AbstractProblem {
         var twoCount = 0;
         var threeCount = 0;
 
-        for (final var input : getInputs()) {
+        for (final var input : getPuzzleInputLines()) {
             if (characterAppearsNTimes(input, 2)) {
                 twoCount++;
             }
@@ -33,8 +32,8 @@ public class Problem2 extends AbstractProblem {
 
     @Override
     public String solvePart2() {
-        for (final var input1 : getInputs()) {
-            for (final var input2 : getInputs()) {
+        for (final var input1 : getPuzzleInputLines()) {
+            for (final var input2 : getPuzzleInputLines()) {
                 assert(input1.length() == input2.length());
                 final var common = getCommonCharacters(input1, input2);
                 if (common.length() == input1.length() - 1) {
@@ -69,11 +68,5 @@ public class Problem2 extends AbstractProblem {
             }
         }
         return similar.toString();
-    }
-
-    private List<String> getInputs() {
-        return getPuzzleInput()
-                .lines()
-                .collect(Collectors.toList());
     }
 }
