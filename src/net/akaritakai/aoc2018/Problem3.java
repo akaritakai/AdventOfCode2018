@@ -53,7 +53,7 @@ public class Problem3 extends AbstractProblem {
     /**
      * Determine the claim area based on the claims provided
      */
-    private Rectangle getClaimArea(final Set<Claim> claims) {
+    private Rectangle getClaimArea(@NotNull final Set<Claim> claims) {
         final var maxWidth = claims.stream()
                 .map(claim -> claim.rectangle.x + claim.rectangle.width)
                 .max(Integer::compare)
@@ -70,7 +70,7 @@ public class Problem3 extends AbstractProblem {
     /**
      * Divides a given rectangle into its quadrants
      */
-    private List<Rectangle> divideIntoQuadrants(final Rectangle region) {
+    private List<Rectangle> divideIntoQuadrants(@NotNull final Rectangle region) {
         return List.of(new Rectangle(0, 0, region.width / 2, region.height / 2),
                 new Rectangle(0, region.height / 2, region.width / 2, region.height / 2),
                 new Rectangle(region.width / 2, 0, region.width / 2, region.height / 2),
@@ -80,7 +80,7 @@ public class Problem3 extends AbstractProblem {
     /**
      * Gets the claims in the region bound by the given rectangle and find the non-overlapping claims
      */
-    private Set<Claim> getOverlappingClaims(final Set<Claim> claims, final Rectangle region) {
+    private Set<Claim> getOverlappingClaims(@NotNull final Set<Claim> claims, @NotNull final Rectangle region) {
         final var subClaims = claims.parallelStream()
                 .filter(claim -> region.contains(claim.rectangle))
                 .collect(Collectors.toSet());
@@ -90,7 +90,7 @@ public class Problem3 extends AbstractProblem {
     /**
      * Gets the set of claims that overlap another in a given set
      */
-    private Set<Claim> getOverlappingClaims(final Set<Claim> claims) {
+    private Set<Claim> getOverlappingClaims(@NotNull final Set<Claim> claims) {
          return claims.parallelStream()
                 .filter(claim1 -> claims.parallelStream()
                         .filter(claim2 -> claim1.id != claim2.id)

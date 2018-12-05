@@ -1,5 +1,7 @@
 package net.akaritakai.aoc2018;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -27,7 +29,7 @@ public class Problem5 extends AbstractProblem {
     return String.valueOf(polymerLength);
   }
 
-  private String reduce(String polymer) {
+  private String reduce(@NotNull String polymer) {
     var prev = polymer;
     while (true) {
       polymer = reduceOnce(polymer);
@@ -40,14 +42,14 @@ public class Problem5 extends AbstractProblem {
     return polymer;
   }
 
-  private String reduceOnce(String polymer) {
+  private String reduceOnce(@NotNull String polymer) {
     for (var pair : REACTION_PAIR) {
       polymer = polymer.replace(pair, "");
     }
     return polymer;
   }
 
-  private String removeType(final String polymer, final char type) {
+  private String removeType(@NotNull final String polymer, final char type) {
     return polymer
         .replace("" + Character.toLowerCase(type), "")
         .replace("" + Character.toUpperCase(type), "");
