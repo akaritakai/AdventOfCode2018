@@ -16,8 +16,9 @@ public class Main {
 
     public static void main(String[] args) {
         PROBLEMS.forEach(problem -> {
-            System.out.println("Day " + problem.getDay() + " Part 1: " + problem.solvePart1());
-            System.out.println("Day " + problem.getDay() + " Part 2: " + problem.solvePart2());
+            final var day = String.format("%02d", problem.getDay());
+            System.out.println("Day " + day + " Part 1: " + problem.solvePart1());
+            System.out.println("Day " + day + " Part 2: " + problem.solvePart2());
         });
     }
 
