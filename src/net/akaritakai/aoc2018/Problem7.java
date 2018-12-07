@@ -50,12 +50,12 @@ public class Problem7 extends AbstractProblem {
     var elapsedTime = 0;
     while (completedNodes.size() < allNodes.size()) {
       // Tick down time left
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < numWorkers; i++) {
         timeLeft[i]--;
       }
 
       // Check if workers are done and process their assignments
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < numWorkers; i++) {
         if (timeLeft[i] <= 0) {
           if (assignments[i] != null) {
             // If we finished an assignment, mark it complete
@@ -74,13 +74,13 @@ public class Problem7 extends AbstractProblem {
       final var available = availableTasks(requirements, completedNodes);
 
       // Tasks that are currently being worked on aren't available
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < numWorkers; i++) {
         available.remove(assignments[i]);
       }
 
       // Assign workers to available tasks
       for (var task : available) {
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < numWorkers; i++) {
           if (timeLeft[i] <= 0) {
             assignments[i] = task;
             timeLeft[i] = timeRequired(task);
