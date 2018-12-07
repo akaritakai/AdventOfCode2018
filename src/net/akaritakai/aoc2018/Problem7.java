@@ -21,7 +21,7 @@ public class Problem7 extends AbstractProblem {
   public String solvePart1() {
     final var requirements = getTaskRequirements();
 
-    final var allTasks = getAllTasks(requirements);
+    final var allTasks = requirements.keySet();
     final Set<String> completedTasks = new HashSet<>();
 
     final var output = new StringBuilder();
@@ -44,7 +44,7 @@ public class Problem7 extends AbstractProblem {
     final var timeLeft = new int[numWorkers];
 
     final var requirements = getTaskRequirements();
-    final var allNodes = getAllTasks(requirements);
+    final var allNodes = requirements.keySet();
     final Set<String> completedNodes = new HashSet<>();
 
     var elapsedTime = 0;
@@ -125,18 +125,6 @@ public class Problem7 extends AbstractProblem {
    */
   private int timeRequired(@NotNull final String task) {
     return task.charAt(0) - 'A' + 61;
-  }
-
-  /**
-   * Gets the set of all tasks we know about
-   */
-  private Set<String> getAllTasks(@NotNull final Map<String, Set<String>> requirements) {
-    final Set<String> allNodes = new HashSet<>();
-    requirements.forEach((node, reqs) -> {
-      allNodes.add(node);
-      allNodes.addAll(reqs);
-    });
-    return allNodes;
   }
 
   /**
