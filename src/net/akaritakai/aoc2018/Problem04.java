@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.intellij.lang.annotations.RegExp;
 
 
-public class Problem4 extends AbstractProblem {
+public class Problem04 extends AbstractProblem {
   @Override
   public int getDay() {
     return 4;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 
-public class Problem5 extends AbstractProblem {
+public class Problem05 extends AbstractProblem {
   @Override
   public int getDay() {
     return 5;

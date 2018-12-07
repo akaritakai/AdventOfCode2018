@@ -2,7 +2,7 @@ package net.akaritakai.aoc2018;
 
 import java.util.HashSet;
 
-public class Problem1 extends AbstractProblem {
+public class Problem01 extends AbstractProblem {
     @Override
     public int getDay() {
         return 1;

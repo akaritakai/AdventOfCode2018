@@ -11,7 +11,7 @@ import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 
 
-public class Problem6 extends AbstractProblem {
+public class Problem06 extends AbstractProblem {
   @Override
   public int getDay() {
     return 6;

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Problem3 extends AbstractProblem {
+public class Problem03 extends AbstractProblem {
     @Override
     public int getDay() {
         return 3;

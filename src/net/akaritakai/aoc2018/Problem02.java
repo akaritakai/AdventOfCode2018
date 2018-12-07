@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Problem2 extends AbstractProblem {
+public class Problem02 extends AbstractProblem {
     @Override
     public int getDay() {
         return 2;
