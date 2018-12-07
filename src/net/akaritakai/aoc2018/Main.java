@@ -9,7 +9,9 @@ public class Main {
             new Problem2(),
             new Problem3(),
             new Problem4(),
-            new Problem5()
+            new Problem5(),
+            new Problem6(),
+            new Problem7()
     );
 
     public static void main(String[] args) {
