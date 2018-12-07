@@ -30,10 +30,10 @@ public class Problem6 extends AbstractProblem {
     // For every point in our finite plane, tile it with the point it is uniquely close to in our list
     // Also, for every point, keep track of its region size
     final Map<Point, Long> regions = new HashMap<>();
-    for (int x = 0; x <= maxWidth; x++) {
-      for (int y = 0; y <= maxHeight; y++) {
-        var point = new Point(x, y);
-        var closestPoints = findClosestPoints(point, points);
+    for (var x = 0; x <= maxWidth; x++) {
+      for (var y = 0; y <= maxHeight; y++) {
+        final var point = new Point(x, y);
+        final var closestPoints = findClosestPoints(point, points);
         if (closestPoints.size() == 1) {
           var closestPoint = closestPoints.get(0);
           plane[x][y] = closestPoint;
@@ -53,7 +53,7 @@ public class Problem6 extends AbstractProblem {
     }
 
     // Get the size of the largest region
-    var largestRegion = regions
+    final var largestRegion = regions
         .entrySet()
         .stream()
         .map(Map.Entry::getValue)
@@ -76,8 +76,8 @@ public class Problem6 extends AbstractProblem {
     // Check every point on our finite plane
     for (var x = 0; x <= maxWidth; x++) {
       for (var y = 0; y <= maxHeight; y++) {
-        var point = new Point(x, y);
-        var distanceSum = points.stream()
+        final var point = new Point(x, y);
+        final var distanceSum = points.stream()
             .mapToLong(p -> distance(p, point))
             .sum();
         if (distanceSum < 10_000) {
@@ -94,7 +94,7 @@ public class Problem6 extends AbstractProblem {
    */
   private List<Point> findClosestPoints(@NotNull final Point point, @NotNull final List<Point> allPoints) {
     // Find the smallest distance
-    var smallestDistance = allPoints.stream()
+    final var smallestDistance = allPoints.stream()
         .filter(p -> !p.equals(point))
         .map(p -> distance(p, point))
         .min(Long::compare)

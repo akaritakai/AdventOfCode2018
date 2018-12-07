@@ -19,21 +19,21 @@ public class Problem7 extends AbstractProblem {
 
   @Override
   public String solvePart1() {
-    var requirements = getTaskRequirements();
+    final var requirements = getTaskRequirements();
 
-    var allTasks = getAllTasks(requirements);
-    Set<String> completedTasks = new HashSet<>();
+    final var allTasks = getAllTasks(requirements);
+    final Set<String> completedTasks = new HashSet<>();
 
-    var sb = new StringBuilder();
+    final var output = new StringBuilder();
     while (completedTasks.size() < allTasks.size()) {
-      var availableTasks = availableTasks(requirements, completedTasks);
+      final var availableTasks = availableTasks(requirements, completedTasks);
       // Get and complete the first available task
-      var task = availableTasks.get(0);
-      sb.append(task);
+      final var task = availableTasks.get(0);
+      output.append(task);
       completedTasks.add(task);
     }
 
-    return sb.toString();
+    return output.toString();
   }
 
   @Override
@@ -55,7 +55,7 @@ public class Problem7 extends AbstractProblem {
       }
 
       // Check if workers are done and process their assignments
-      for (int i = 0; i < 5; i++) {
+      for (var i = 0; i < 5; i++) {
         if (timeLeft[i] <= 0) {
           if (assignments[i] != null) {
             // If we finished an assignment, mark it complete
@@ -71,16 +71,16 @@ public class Problem7 extends AbstractProblem {
       }
 
       // Get available nodes
-      var available = availableTasks(requirements, completedNodes);
+      final var available = availableTasks(requirements, completedNodes);
 
       // Tasks that are currently being worked on aren't available
-      for (int i = 0; i < 5; i++) {
+      for (var i = 0; i < 5; i++) {
         available.remove(assignments[i]);
       }
 
       // Assign workers to available tasks
-      for (String task : available) {
-        for (int i = 0; i < 5; i++) {
+      for (var task : available) {
+        for (var i = 0; i < 5; i++) {
           if (timeLeft[i] <= 0) {
             assignments[i] = task;
             timeLeft[i] = timeRequired(task);
@@ -95,7 +95,8 @@ public class Problem7 extends AbstractProblem {
     return String.valueOf(elapsedTime);
   }
 
-  private List<String> availableTasks(Map<String, Set<String>> taskRequirements, Set<String> completedTasks) {
+  private List<String> availableTasks(@NotNull final Map<String, Set<String>> taskRequirements,
+      @NotNull final Set<String> completedTasks) {
     final List<String> availableTasks = new ArrayList<>();
     taskRequirements.forEach((task, requirements) -> {
       // Already existing tasks don't need to be done again
@@ -103,12 +104,12 @@ public class Problem7 extends AbstractProblem {
         return;
       }
 
-      // Filter out already completed tasks from the requirements list
-      var copy = new HashSet<>(requirements);
-      copy.removeAll(completedTasks);
+      // Determine our current list of prerequisites needed by filtering out tasks already completed
+      final var prerequisites = new HashSet<>(requirements);
+      prerequisites.removeAll(completedTasks);
 
       // If we've met all the prerequisites, the task is available
-      if (copy.isEmpty()) {
+      if (prerequisites.isEmpty()) {
         availableTasks.add(task);
       }
     });
@@ -145,11 +146,11 @@ public class Problem7 extends AbstractProblem {
     final Map<String, Set<String>> map = new HashMap<>();
     getPuzzleInputLines().forEach(line -> {
           @RegExp final var regex = "^Step (\\S+) must be finished before step (\\S+) can begin.";
-          var node = line.replaceAll(regex, "$2");
-          var nodeRequirement = line.replaceAll(regex, "$1");
+          final var node = line.replaceAll(regex, "$2");
+          final var requirement = line.replaceAll(regex, "$1");
           map.computeIfAbsent(node, s -> new HashSet<>());
-          map.computeIfAbsent(nodeRequirement, s -> new HashSet<>());
-          map.get(node).add(nodeRequirement);
+          map.computeIfAbsent(requirement, s -> new HashSet<>());
+          map.get(node).add(requirement);
         });
     return map;
   }
