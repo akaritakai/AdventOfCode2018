@@ -33,9 +33,8 @@ public class Problem6 extends AbstractProblem {
     for (var x = 0; x <= maxWidth; x++) {
       for (var y = 0; y <= maxHeight; y++) {
         final var point = new Point(x, y);
-        final var closestPoints = findClosestPoints(point, points);
-        if (closestPoints.size() == 1) {
-          var closestPoint = closestPoints.get(0);
+        final var closestPoint = findClosestPoint(point, points);
+        if (closestPoint != null) {
           plane[x][y] = closestPoint;
           regions.put(closestPoint, regions.getOrDefault(closestPoint, 0L) + 1);
         }
@@ -90,21 +89,23 @@ public class Problem6 extends AbstractProblem {
   }
 
   /**
-   * Gets the list of points closest to the given point from the provided list of points.
+   * Returns the closest point from a list of points to the given point, but only if it is uniquely close
    */
-  private List<Point> findClosestPoints(@NotNull final Point point, @NotNull final List<Point> allPoints) {
-    // Find the smallest distance
-    final var smallestDistance = allPoints.stream()
+  private Point findClosestPoint(@NotNull final Point point, @NotNull final List<Point> allPoints) {
+    // Find the closest point
+    final var closestPoint = allPoints.stream()
         .filter(p -> !p.equals(point))
-        .map(p -> distance(p, point))
-        .min(Long::compare)
-        .orElse(-1L);
+        .min(Comparator.comparingLong(p -> distance(p, point)))
+        .orElseThrow();
 
-    // Return points that have the smallest distance
-    return allPoints.stream()
+    // Determine if that point is uniquely close
+    final var isUnique = allPoints.stream()
         .filter(p -> !p.equals(point))
-        .filter(p -> distance(p, point) == smallestDistance)
-        .collect(Collectors.toList());
+        .filter(p -> !p.equals(closestPoint))
+        .noneMatch(p -> distance(point, p) == distance(point, closestPoint));
+
+    // Return the closest point only if it is unique
+    return isUnique ? closestPoint : null;
   }
 
   /**
