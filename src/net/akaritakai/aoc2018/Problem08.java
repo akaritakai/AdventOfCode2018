@@ -31,7 +31,7 @@ public class Problem08 extends AbstractProblem {
      */
     private int sumAllMetadata(final Node node) {
         var sum = node.metadataSum();
-        for (Node child : node.children) {
+        for (final Node child : node.children) {
             sum += sumAllMetadata(child);
         }
         return sum;
