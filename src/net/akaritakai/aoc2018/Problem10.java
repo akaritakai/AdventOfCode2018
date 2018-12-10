@@ -31,27 +31,24 @@ public class Problem10 extends AbstractProblem {
         inputs.forEach(Lights::undoMove);
 
         // Calculate the bounds of the area
-        final var minHeight = inputs.stream().mapToInt(pm -> pm.position.y).min().orElseThrow();
-        final var maxHeight = inputs.stream().mapToInt(pm -> pm.position.y).max().orElseThrow();
-        final var minWidth =  inputs.stream().mapToInt(pm -> pm.position.x).min().orElseThrow();
-        final var maxWidth =  inputs.stream().mapToInt(pm -> pm.position.x).max().orElseThrow();
+        final var area = getLightDimensions(inputs);
 
         // Print the area out to reveal the message
-        final var area = new StringBuilder();
-        for (var height = minHeight - 1; height <= maxHeight + 1; height++) {
-            for (var width = minWidth - 1; width <= maxWidth + 1; width++) {
+        final var sb = new StringBuilder();
+        for (var height = area.y - 1; height <= area.y + area.height + 1; height++) {
+            for (var width = area.x - 1; width <= area.x + area.width + 1; width++) {
                 final var x = width;
                 final var y = height;
                 final boolean hasPoint = inputs.stream().anyMatch(pm -> pm.position.x == x && pm.position.y == y);
                 if (hasPoint) {
-                    area.append("#");
+                    sb.append("#");
                 } else {
-                    area.append(".");
+                    sb.append(".");
                 }
             }
-            area.append("\n");
+            sb.append("\n");
         }
-        return "\n" + area.toString().trim();
+        return "\n" + sb.toString().trim();
     }
 
     @Override
@@ -76,14 +73,20 @@ public class Problem10 extends AbstractProblem {
         return String.valueOf(step);
     }
 
-    private BigInteger getLightArea(final List<Lights> lights) {
+    private Rectangle getLightDimensions(final List<Lights> lights) {
         final var minHeight = lights.stream().mapToInt(pm -> pm.position.y).min().orElseThrow();
         final var maxHeight = lights.stream().mapToInt(pm -> pm.position.y).max().orElseThrow();
         final var minWidth =  lights.stream().mapToInt(pm -> pm.position.x).min().orElseThrow();
         final var maxWidth =  lights.stream().mapToInt(pm -> pm.position.x).max().orElseThrow();
 
-        final var height = BigInteger.valueOf(maxHeight).subtract(BigInteger.valueOf(minHeight)).abs();
-        final var width = BigInteger.valueOf(maxWidth).subtract(BigInteger.valueOf(minWidth)).abs();
+        return new Rectangle(minWidth, minHeight, maxWidth - minWidth, maxHeight - minHeight);
+    }
+
+    private BigInteger getLightArea(final List<Lights> lights) {
+        var area = getLightDimensions(lights);
+
+        final var height = BigInteger.valueOf(area.y).subtract(BigInteger.valueOf(area.y + area.height)).abs();
+        final var width = BigInteger.valueOf(area.x).subtract(BigInteger.valueOf(area.x + area.width)).abs();
 
         return height.multiply(width);
     }
