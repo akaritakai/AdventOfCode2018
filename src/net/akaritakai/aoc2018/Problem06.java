@@ -58,7 +58,7 @@ public class Problem06 extends AbstractProblem {
         .map(Map.Entry::getValue)
         .max(Long::compare);
 
-    return largestRegion.map(String::valueOf).orElse(null);
+    return largestRegion.map(String::valueOf).orElseThrow();
   }
 
   @Override

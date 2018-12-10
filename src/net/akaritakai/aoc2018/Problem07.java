@@ -133,7 +133,7 @@ public class Problem07 extends AbstractProblem {
   private Map<String, Set<String>> getTaskRequirements() {
     final Map<String, Set<String>> map = new HashMap<>();
     getPuzzleInputLines().forEach(line -> {
-          @RegExp final var regex = "^Step (\\S+) must be finished before step (\\S+) can begin.";
+          @RegExp final var regex = "^Step (\\S+) must be finished before step (\\S+) can begin.$";
           final var node = line.replaceAll(regex, "$2");
           final var requirement = line.replaceAll(regex, "$1");
           map.computeIfAbsent(node, s -> new HashSet<>());

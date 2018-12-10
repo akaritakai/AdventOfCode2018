@@ -25,7 +25,7 @@ public class Problem05 extends AbstractProblem {
         .mapToObj(c -> removeType(getPuzzleInput(), (char) c))
         .mapToInt(s -> reduce(s).length())
         .min()
-        .orElse(-1);
+        .orElseThrow();
     return String.valueOf(polymerLength);
   }
 

@@ -47,7 +47,7 @@ public class Problem03 extends AbstractProblem {
                 .findAny();
 
         // Return the claim's id
-        return claim.map(c -> c.id).map(String::valueOf).orElse(null);
+        return claim.map(c -> c.id).map(String::valueOf).orElseThrow();
     }
 
     /**
@@ -57,12 +57,12 @@ public class Problem03 extends AbstractProblem {
         final var maxWidth = claims.stream()
                 .map(claim -> claim.rectangle.x + claim.rectangle.width)
                 .max(Integer::compare)
-                .orElse(-1);
+                .orElseThrow();
 
         final var maxHeight = claims.stream()
                 .map(claim -> claim.rectangle.y + claim.rectangle.height)
                 .max(Integer::compare)
-                .orElse(-1);
+                .orElseThrow();
 
         return new Rectangle(0, 0, maxWidth, maxHeight);
     }
