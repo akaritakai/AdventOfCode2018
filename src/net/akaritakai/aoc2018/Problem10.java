@@ -18,7 +18,7 @@ public class Problem10 extends AbstractProblem {
     public String solvePart1() {
         var inputs = getInput();
 
-        // Get the moment with the area is the smallest
+        // Get the moment when the area is the smallest
         var lastSize = getLightArea(inputs);
         while (true) {
             var currentSize = getLightArea(inputs);
@@ -58,7 +58,7 @@ public class Problem10 extends AbstractProblem {
     public String solvePart2() {
         final var inputs = getInput();
 
-        // Get the moment with the area is the smallest
+        // Get the moment when the area is the smallest
         var step = 0;
         var lastSize = getLightArea(inputs);
         while (true) {
