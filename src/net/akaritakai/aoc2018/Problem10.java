@@ -19,9 +19,9 @@ public class Problem10 extends AbstractProblem {
         var inputs = getInput();
 
         // Get the moment with the area is the smallest
-        var lastSize = getParticleArea(inputs);
+        var lastSize = getLightArea(inputs);
         while (true) {
-            var currentSize = getParticleArea(inputs);
+            var currentSize = getLightArea(inputs);
             if (currentSize.compareTo(lastSize) > 0) {
                 break;
             }
@@ -60,9 +60,9 @@ public class Problem10 extends AbstractProblem {
 
         // Get the moment with the area is the smallest
         var step = 0;
-        var lastSize = getParticleArea(inputs);
+        var lastSize = getLightArea(inputs);
         while (true) {
-            var currentSize = getParticleArea(inputs);
+            var currentSize = getLightArea(inputs);
             if (currentSize.compareTo(lastSize) > 0) {
                 step--;
                 break;
@@ -76,11 +76,11 @@ public class Problem10 extends AbstractProblem {
         return String.valueOf(step);
     }
 
-    private BigInteger getParticleArea(final List<Lights> particles) {
-        final var minHeight = particles.stream().mapToInt(pm -> pm.position.y).min().orElseThrow();
-        final var maxHeight = particles.stream().mapToInt(pm -> pm.position.y).max().orElseThrow();
-        final var minWidth =  particles.stream().mapToInt(pm -> pm.position.x).min().orElseThrow();
-        final var maxWidth =  particles.stream().mapToInt(pm -> pm.position.x).max().orElseThrow();
+    private BigInteger getLightArea(final List<Lights> lights) {
+        final var minHeight = lights.stream().mapToInt(pm -> pm.position.y).min().orElseThrow();
+        final var maxHeight = lights.stream().mapToInt(pm -> pm.position.y).max().orElseThrow();
+        final var minWidth =  lights.stream().mapToInt(pm -> pm.position.x).min().orElseThrow();
+        final var maxWidth =  lights.stream().mapToInt(pm -> pm.position.x).max().orElseThrow();
 
         final var height = BigInteger.valueOf(maxHeight).subtract(BigInteger.valueOf(minHeight)).abs();
         final var width = BigInteger.valueOf(maxWidth).subtract(BigInteger.valueOf(minWidth)).abs();
