@@ -13,7 +13,8 @@ public class Main {
             new Problem06(),
             new Problem07(),
             new Problem08(),
-            new Problem09()
+            new Problem09(),
+            new Problem10()
     );
 
     public static void main(String[] args) {
