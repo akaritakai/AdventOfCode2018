@@ -56,7 +56,7 @@ public class Problem11 extends AbstractProblem {
 
     private int[][] getFuelCellPartialSums(final int serialNumber) {
         final var fuelCells = new int[301][301];
-        // Init fuel cell data
+        // Initialize fuel cell data
         for (var x = 1; x <= 300; x++) {
             for (var y = 1; y <= 300; y++) {
                 final var rackId = x + 10;
