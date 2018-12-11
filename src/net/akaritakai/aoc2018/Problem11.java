@@ -60,12 +60,7 @@ public class Problem11 extends AbstractProblem {
         for (var x = 1; x <= 300; x++) {
             for (var y = 1; y <= 300; y++) {
                 final var rackId = x + 10;
-                var power = rackId * y;
-                power += serialNumber;
-                power *= rackId;
-                power /= 100;
-                power %= 10;
-                power -= 5;
+                final var power = ((rackId * y + serialNumber) * rackId / 100) % 10 - 5;
                 fuelCells[x][y] = power;
             }
         }
