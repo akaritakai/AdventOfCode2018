@@ -19,7 +19,7 @@ public class Problem11 extends AbstractProblem {
         var size = 3;
         for (var x = 1; x <= 300 - size; x++) {
             for (var y = 1; y <= 300 - size; y++) {
-                var sum = cells[x + size][y + size] - cells[x][y + size] - cells[x + size][y] + cells[x][y];
+                var sum = cells[x + size][y + size] - cells[x + size][y] - cells[x][y + size] + cells[x][y];
                 if (sum >= maxSum) {
                     maxSum = sum;
                     point = new Point(x + 1, y + 1);
@@ -41,7 +41,7 @@ public class Problem11 extends AbstractProblem {
         for (var size = 1; size <= 300; size++) {
             for (var x = 1; x <= 300 - size; x++) {
                 for (var y = 1; y <= 300 - size; y++) {
-                    var sum = cells[x + size][y + size] - cells[x][y + size] - cells[x + size][y] + cells[x][y];
+                    var sum = cells[x + size][y + size] - cells[x + size][y] - cells[x][y + size]  + cells[x][y];
                     if (sum >= maxSum) {
                         maxSum = sum;
                         maxSize = size;
