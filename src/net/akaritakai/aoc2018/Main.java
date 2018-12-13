@@ -15,7 +15,8 @@ public class Main {
             new Problem08(),
             new Problem09(),
             new Problem10(),
-            new Problem11()
+            new Problem11(),
+            new Problem12()
     );
 
     public static void main(String[] args) {
