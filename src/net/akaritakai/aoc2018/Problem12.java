@@ -68,7 +68,8 @@ public class Problem12 extends AbstractProblem {
     return extrapolate(previousGeneration, previousSum, currentGeneration, currentSum, 50_000_000_000L).toString();
   }
 
-  private BigInteger extrapolate(long oldGen, long oldSum, long newGen, long newSum, long targetGen) {
+  private BigInteger extrapolate(final long oldGen, final long oldSum, final long newGen, final long newSum,
+      final long targetGen) {
     assert(newGen - oldGen == 1);
     final var slope = BigInteger.valueOf(newSum).subtract(BigInteger.valueOf(oldSum));
     return slope.multiply(BigInteger.valueOf(targetGen))
@@ -186,7 +187,7 @@ public class Problem12 extends AbstractProblem {
     final String match;
     final String result;
 
-    public Rule(String match, String result) {
+    Rule(String match, String result) {
       this.match = match;
       this.result = result;
     }
