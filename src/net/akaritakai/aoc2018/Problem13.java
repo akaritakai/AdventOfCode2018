@@ -1,9 +1,9 @@
 package net.akaritakai.aoc2018;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -21,7 +21,7 @@ public class Problem13 extends AbstractProblem {
       tick();
     }
 
-    var collisionPoint = crashed.stream()
+    final var collisionPoint = crashed.stream()
         .findAny()
         .map(cart -> new Point(cart.x, cart.y))
         .orElseThrow();
@@ -37,27 +37,27 @@ public class Problem13 extends AbstractProblem {
       tick();
     }
 
-    var point = carts.stream()
+    final var cartLocation = carts.stream()
         .findAny()
         .map(cart -> new Point(cart.x, cart.y))
         .orElseThrow();
 
-    return String.format("%d,%d", point.x, point.y);
+    return String.format("%d,%d", cartLocation.x, cartLocation.y);
   }
 
   private char track[][];
-  private List<Cart> carts;
-  private List<Cart> crashed;
+  private Set<Cart> carts;
+  private Set<Cart> crashed;
 
   private void tick() {
     // Sort the carts by their movement order
-    List<Cart> allCarts = carts
+    final var allCarts = carts
         .stream()
         .sorted(Comparator.comparingInt((Cart cart) -> cart.y).thenComparingInt(cart -> cart.x))
         .collect(Collectors.toList());
 
     // Move the carts one at a time
-    for (Cart cart1 : allCarts) {
+    for (final var cart1 : allCarts) {
       if (crashed.contains(cart1)) {
         continue; // If we've already crashed, don't move
       }
@@ -66,7 +66,7 @@ public class Problem13 extends AbstractProblem {
       cart1.moveCart(track);
 
       // Check for collisions against every other cart
-      for (Cart cart2 : allCarts) {
+      for (final var cart2 : allCarts) {
         if (cart1 == cart2 || crashed.contains(cart1) || crashed.contains(cart2)) {
           // We can't collide with ourself, or crash again if we've already crashed.
           continue;
@@ -90,9 +90,9 @@ public class Problem13 extends AbstractProblem {
     final var width = lines.stream().mapToInt(String::length).max().orElseThrow();
     final var height = lines.size();
     track = new char[width][height];
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        char c = lines.get(y).charAt(x);
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        var c = lines.get(y).charAt(x);
         switch (c) {
           case '^': c = '|'; break;
           case 'v': c = '|'; break;
@@ -104,10 +104,10 @@ public class Problem13 extends AbstractProblem {
     }
 
     // Process the carts
-    carts = new ArrayList<>();
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        char c = lines.get(y).charAt(x);
+    carts = new HashSet<>();
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        final var c = lines.get(y).charAt(x);
         switch (c) {
           case '^': carts.add(new Cart(x, y, Direction.UP)); break;
           case 'v': carts.add(new Cart(x, y, Direction.DOWN)); break;
@@ -118,7 +118,7 @@ public class Problem13 extends AbstractProblem {
     }
 
     // Initialize the list of crashes
-    crashed = new ArrayList<>();
+    crashed = new HashSet<>();
   }
 
   static class Cart {
@@ -127,13 +127,13 @@ public class Problem13 extends AbstractProblem {
     Direction direction;
     Turn turn = Turn.LEFT;
 
-    Cart(int x, int y, Direction direction) {
+    Cart(final int x, final int y, final Direction direction) {
       this.x = x;
       this.y = y;
       this.direction = direction;
     }
 
-    void moveCart(char[][] track) {
+    void moveCart(final char[][] track) {
       // Move in the direction we are pointing
       x += direction.dx;
       y += direction.dy;
@@ -144,7 +144,7 @@ public class Problem13 extends AbstractProblem {
         case '\\':
           direction = direction.curve(track[x][y]);
           break;
-        // At intersections, turn ourselves
+        // At intersections, change direction according to our turn state
         case '+':
           direction = direction.turn(turn);
           turn = turn.nextTurn();
@@ -168,7 +168,7 @@ public class Problem13 extends AbstractProblem {
       this.dy = dy;
     }
 
-    Direction curve(char track) {
+    Direction curve(final char track) {
       switch (track) {
         case '/':
           switch (this) {
@@ -188,7 +188,7 @@ public class Problem13 extends AbstractProblem {
       throw new RuntimeException();
     }
 
-    Direction turn(Turn turn) {
+    Direction turn(final Turn turn) {
       switch (this) {
         case UP:
           switch (turn) {
