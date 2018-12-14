@@ -26,7 +26,7 @@ public class Problem09 extends AbstractProblem {
      * Play the game with the specified number players and the specified value of the last marble
      * @return the winner's score
      */
-    private long getScore(int numPlayers, int lastMarble) {
+    private long getScore(final int numPlayers, final int lastMarble) {
         final var scores = new long[numPlayers];
         final var marbles = new Marbles();
         marbles.addFirst(0);

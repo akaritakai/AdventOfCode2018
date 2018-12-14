@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 
 public class Problem13 extends AbstractProblem {
@@ -127,13 +128,13 @@ public class Problem13 extends AbstractProblem {
     Direction direction;
     Turn turn = Turn.LEFT;
 
-    Cart(final int x, final int y, final Direction direction) {
+    Cart(final int x, final int y, @NotNull final Direction direction) {
       this.x = x;
       this.y = y;
       this.direction = direction;
     }
 
-    void moveCart(final char[][] track) {
+    void moveCart(@NotNull final char[][] track) {
       // Move in the direction we are pointing
       x += direction.dx;
       y += direction.dy;
@@ -188,7 +189,7 @@ public class Problem13 extends AbstractProblem {
       throw new RuntimeException();
     }
 
-    Direction turn(final Turn turn) {
+    Direction turn(@NotNull final Turn turn) {
       switch (this) {
         case UP:
           switch (turn) {

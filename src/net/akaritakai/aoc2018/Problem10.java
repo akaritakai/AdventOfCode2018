@@ -6,6 +6,8 @@ import java.awt.*;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+
 
 @SuppressWarnings("Duplicates")
 public class Problem10 extends AbstractProblem {
@@ -73,7 +75,7 @@ public class Problem10 extends AbstractProblem {
         return String.valueOf(step);
     }
 
-    private Rectangle getLightDimensions(final List<Lights> lights) {
+    private Rectangle getLightDimensions(@NotNull final List<Lights> lights) {
         final var minHeight = lights.stream().mapToInt(pm -> pm.position.y).min().orElseThrow();
         final var maxHeight = lights.stream().mapToInt(pm -> pm.position.y).max().orElseThrow();
         final var minWidth =  lights.stream().mapToInt(pm -> pm.position.x).min().orElseThrow();
@@ -82,7 +84,7 @@ public class Problem10 extends AbstractProblem {
         return new Rectangle(minWidth, minHeight, maxWidth - minWidth, maxHeight - minHeight);
     }
 
-    private BigInteger getLightArea(final List<Lights> lights) {
+    private BigInteger getLightArea(@NotNull final List<Lights> lights) {
         var area = getLightDimensions(lights);
 
         final var height = BigInteger.valueOf(area.y).subtract(BigInteger.valueOf(area.y + area.height)).abs();
@@ -110,7 +112,7 @@ public class Problem10 extends AbstractProblem {
         final int dx;
         final int dy;
 
-        Lights(Point position, int dx, int dy) {
+        Lights(@NotNull final Point position, final int dx, final int dy) {
             this.position = position;
             this.dx = dx;
             this.dy = dy;

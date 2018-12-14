@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 
 public class Problem14 extends AbstractProblem {
@@ -103,9 +104,9 @@ public class Problem14 extends AbstractProblem {
   /**
    * Checks if the provided list of numbers are present in our recipes at the given starting position
    */
-  private boolean findMatch(List<Integer> list, int startPos) {
-    boolean matches = true;
-    for (int i = 0; i < list.size(); i++) {
+  private boolean findMatch(@NotNull final List<Integer> list, final int startPos) {
+    var matches = true;
+    for (var i = 0; i < list.size(); i++) {
       if (!Objects.equals(list.get(i), recipes.get(startPos + i))) {
         matches = false;
         break;

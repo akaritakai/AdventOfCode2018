@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.intellij.lang.annotations.RegExp;
+import org.jetbrains.annotations.NotNull;
 
 
 public class Problem12 extends AbstractProblem {
@@ -11,11 +12,12 @@ public class Problem12 extends AbstractProblem {
   public int getDay() {
     return 12;
   }
+
   @Override
   public String solvePart1() {
     cells = getInitialState();
     rules = getRules();
-    position = 0;
+    positionOffset = 0;
     for (var i = 1; i <= 20; i++) {
       iterate();
     }
@@ -39,11 +41,11 @@ public class Problem12 extends AbstractProblem {
 
     cells = getInitialState();
     rules = getRules();
-    position = 0;
+    positionOffset = 0;
 
     long i = 1;
     var lastCells = cells;
-    var lastPosition = position;
+    var lastPosition = positionOffset;
     for (; i <= 50_000_000_000L; i++) {
       iterate();
       if (lastCells.equals(cells)) {
@@ -51,7 +53,7 @@ public class Problem12 extends AbstractProblem {
         break;
       }
       lastCells = cells;
-      lastPosition = position;
+      lastPosition = positionOffset;
     }
 
     // Find our current data point
@@ -61,7 +63,7 @@ public class Problem12 extends AbstractProblem {
     // Find our previous data point
     final var previousGeneration = i - 1;
     cells = lastCells;
-    position = lastPosition;
+    positionOffset = lastPosition;
     final var previousSum = sum();
 
     // Extrapolate what the sum would be at 50 billion generations
@@ -90,7 +92,7 @@ public class Problem12 extends AbstractProblem {
   /**
    * The position of the first cell (cell 0) relative to our current in-memory set of cells
    */
-  private long position = 0;
+  private long positionOffset = 0;
 
   /**
    * Find the next generation of cells given their current state and the list of rules
@@ -100,10 +102,10 @@ public class Problem12 extends AbstractProblem {
 
     // Append an inactive neighborhood on either end of our current cells
     final var oldCells = "....." + cells + ".....";
-    position += 5;
+    positionOffset += 5;
 
     // Calculate the new state of each cell
-    for (int i = 0; i < oldCells.length(); i++) {
+    for (var i = 0; i < oldCells.length(); i++) {
       final var neighborhood = getNeighborhood(oldCells, i);
       final var newCell = rules.stream()
           .filter(rule -> rule.match.equals(neighborhood))
@@ -116,7 +118,7 @@ public class Problem12 extends AbstractProblem {
 
     // Strip off inactive neighborhoods
     while (newCells.startsWith(".")) {
-      position -= 1;
+      positionOffset -= 1;
       newCells = newCells.substring(1);
     }
     while (newCells.endsWith(".")) {
@@ -133,9 +135,9 @@ public class Problem12 extends AbstractProblem {
   private long sum() {
     var sum = 0;
     for (var i = 0; i < cells.length(); i++) {
-      var pot = i - position;
+      var position = i - positionOffset;
       if (cells.charAt(i) == '#') {
-        sum += pot;
+        sum += position;
       }
     }
     return sum;
@@ -144,7 +146,7 @@ public class Problem12 extends AbstractProblem {
   /**
    * Get the neighborhood for the cell at index i within a set of cells
    */
-  private String getNeighborhood(final String cells, final int i) {
+  private String getNeighborhood(@NotNull final String cells, final int i) {
     if (i - 2 < 0) {
       final var result = new StringBuilder(cells.substring(0, i + 3));
       while (result.length() < 5) {
@@ -184,11 +186,11 @@ public class Problem12 extends AbstractProblem {
         .collect(Collectors.toList());
   }
 
-  private static class Rule {
+  static class Rule {
     final String match;
     final String result;
 
-    Rule(String match, String result) {
+    Rule(@NotNull final String match, @NotNull final String result) {
       this.match = match;
       this.result = result;
     }
