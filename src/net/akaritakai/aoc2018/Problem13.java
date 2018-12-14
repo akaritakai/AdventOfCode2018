@@ -1,9 +1,9 @@
 package net.akaritakai.aoc2018;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -22,7 +22,7 @@ public class Problem13 extends AbstractProblem {
     }
 
     final var collisionPoint = crashed.stream()
-        .findAny()
+        .findFirst()
         .map(cart -> new Point(cart.x, cart.y))
         .orElseThrow();
 
@@ -46,8 +46,8 @@ public class Problem13 extends AbstractProblem {
   }
 
   private char track[][];
-  private Set<Cart> carts;
-  private Set<Cart> crashed;
+  private List<Cart> carts;
+  private List<Cart> crashed;
 
   private void tick() {
     // Sort the carts by their movement order
@@ -104,7 +104,7 @@ public class Problem13 extends AbstractProblem {
     }
 
     // Process the carts
-    carts = new HashSet<>();
+    carts = new ArrayList<>();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final var c = lines.get(y).charAt(x);
@@ -118,7 +118,7 @@ public class Problem13 extends AbstractProblem {
     }
 
     // Initialize the list of crashes
-    crashed = new HashSet<>();
+    crashed = new ArrayList<>();
   }
 
   static class Cart {
