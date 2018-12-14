@@ -68,6 +68,7 @@ public class Problem12 extends AbstractProblem {
     return extrapolate(previousGeneration, previousSum, currentGeneration, currentSum, 50_000_000_000L).toString();
   }
 
+  @SuppressWarnings("SameParameterValue")
   private BigInteger extrapolate(final long oldGen, final long oldSum, final long newGen, final long newSum,
       final long targetGen) {
     assert(newGen - oldGen == 1);

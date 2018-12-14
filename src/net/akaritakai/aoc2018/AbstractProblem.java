@@ -1,7 +1,7 @@
 package net.akaritakai.aoc2018;
 
 
-public abstract class AbstractProblem {
+abstract class AbstractProblem {
 
     private volatile String _puzzleInput;
 
@@ -9,7 +9,7 @@ public abstract class AbstractProblem {
      * Gets the puzzle input for this day's problem
      * @return the puzzle input for this day's problem
      */
-    protected String getPuzzleInput() {
+    String getPuzzleInput() {
         if (_puzzleInput == null) {
             _puzzleInput = PuzzleInputFetcher.getPuzzleInput(getDay());
         }
