@@ -34,7 +34,7 @@ public class PuzzleInputFetcher {
                     .header("cookie", "session=" + INSTANCE._sessionToken)
                     .GET()
                     .build();
-            final var puzzle = client.send(request, BodyHandlers.ofString()).body().trim();
+            final var puzzle = client.send(request, BodyHandlers.ofString()).body();
 
             // Store the puzzle locally
             Files.writeString(cachedPuzzle, puzzle);

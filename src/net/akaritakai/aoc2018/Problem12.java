@@ -162,8 +162,8 @@ public class Problem12 extends AbstractProblem {
   }
 
   private String getInitialState() {
-    return getPuzzleInputLines()
-        .stream()
+    return getPuzzleInput()
+        .lines()
         .filter(line -> line.startsWith("initial state: "))
         .map(line -> line.replace("initial state: ", "").trim())
         .findAny()
@@ -171,8 +171,8 @@ public class Problem12 extends AbstractProblem {
   }
 
   private List<Rule> getRules() {
-    return getPuzzleInputLines()
-        .stream()
+    return getPuzzleInput()
+        .lines()
         .filter(line -> line.contains("=>"))
         .map(line -> {
           @RegExp final var regex = "^(\\S+?)\\s+=>\\s+(\\S+)$";

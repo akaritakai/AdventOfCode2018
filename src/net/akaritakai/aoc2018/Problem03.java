@@ -99,8 +99,8 @@ public class Problem03 extends AbstractProblem {
     }
 
     private Set<Claim> getClaims() {
-        return getPuzzleInputLines()
-                .stream()
+        return getPuzzleInput()
+                .lines()
                 .map(Claim::fromString)
                 .collect(Collectors.toSet());
     }

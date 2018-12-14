@@ -64,11 +64,11 @@ public class Problem09 extends AbstractProblem {
 
     private int getNumPlayers() {
         @RegExp final var regex = "^(\\d+) players; last marble is worth \\d+ points$";
-        return Integer.parseInt(getPuzzleInput().replaceAll(regex, "$1"));
+        return Integer.parseInt(getPuzzleInput().trim().replaceAll(regex, "$1"));
     }
 
     private int getLastMarble() {
         @RegExp final var regex = "^\\d+ players; last marble is worth (\\d+) points$";
-        return Integer.parseInt(getPuzzleInput().replaceAll(regex, "$1"));
+        return Integer.parseInt(getPuzzleInput().trim().replaceAll(regex, "$1"));
     }
 }

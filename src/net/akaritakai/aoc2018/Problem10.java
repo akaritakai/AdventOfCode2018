@@ -92,8 +92,8 @@ public class Problem10 extends AbstractProblem {
     }
 
     private List<Lights> getInput() {
-        return getPuzzleInputLines()
-                .stream()
+        return getPuzzleInput()
+                .lines()
                 .map(line -> {
                     @RegExp final var regex = "^position=<\\s*(-?\\d+),\\s*(-?\\d+)>\\s*velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>$";
                     final var x = Integer.parseInt(line.replaceAll(regex, "$1"));

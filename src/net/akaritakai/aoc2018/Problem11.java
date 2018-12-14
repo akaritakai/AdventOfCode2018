@@ -11,7 +11,7 @@ public class Problem11 extends AbstractProblem {
 
     @Override
     public String solvePart1() {
-        final var serialNumber = Integer.parseInt(getPuzzleInput());
+        final var serialNumber = Integer.parseInt(getPuzzleInput().trim());
         final var cells = getFuelCellPartialSums(serialNumber);
 
         var maxSum = 0;
@@ -32,7 +32,7 @@ public class Problem11 extends AbstractProblem {
 
     @Override
     public String solvePart2() {
-        final var serialNumber = Integer.parseInt(getPuzzleInput());
+        final var serialNumber = Integer.parseInt(getPuzzleInput().trim());
         final var cells = getFuelCellPartialSums(serialNumber);
 
         var maxSum = 0;

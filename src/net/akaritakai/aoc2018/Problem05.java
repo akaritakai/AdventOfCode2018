@@ -15,14 +15,14 @@ public class Problem05 extends AbstractProblem {
 
   @Override
   public String solvePart1() {
-    return String.valueOf(reduce(getPuzzleInput()).length());
+    return String.valueOf(reduce(getPuzzleInput().trim()).length());
   }
 
   @Override
   public String solvePart2() {
     final var polymerLength = IntStream.rangeClosed('a', 'z')
         .parallel()
-        .mapToObj(c -> removeType(getPuzzleInput(), (char) c))
+        .mapToObj(c -> removeType(getPuzzleInput().trim(), (char) c))
         .mapToInt(s -> reduce(s).length())
         .min()
         .orElseThrow();

@@ -116,8 +116,8 @@ public class Problem06 extends AbstractProblem {
   }
 
   private List<Point> getPoints() {
-    return getPuzzleInputLines()
-        .stream()
+    return getPuzzleInput()
+        .lines()
         .map(line -> {
           @RegExp final var regex = "^(\\d+), (\\d+)$";
           final var x = Integer.parseInt(line.replaceAll(regex, "$1"));
