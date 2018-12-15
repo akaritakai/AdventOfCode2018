@@ -66,10 +66,7 @@ public class Problem15 extends AbstractProblem {
     final var failures = new ConcurrentLinkedQueue<Integer>();
     final var removals = new ConcurrentLinkedQueue<Predicate<Integer>>();
 
-    while (maxFailedPower + 1 != minSuccessPower) {
-      if (minSuccessPower == 4 && powers.size() == 1 && powers.get(0) == 4) {
-        break; // Edge case where we never observe a failure (the answer is 4)
-      }
+    while (maxFailedPower + 1 != minSuccessPower && !powers.isEmpty()) {
       // Parallelize the search
       Lists.partition(powers, (powers.size() / numCores) + 1).parallelStream().forEach(searchSpace -> {
         // Pick the midpoint of our assigned search space
@@ -92,11 +89,11 @@ public class Problem15 extends AbstractProblem {
           // Elves survived
           successes.add(power);
           outcomes.put(power, problem.getOutcome());
-          removals.add(i -> i > power);
+          removals.add(i -> i >= power);
         } else {
           // Elves did not survive
           failures.add(power);
-          removals.add(i -> i < power);
+          removals.add(i -> i <= power);
         }
       });
 
