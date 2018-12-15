@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,6 +147,11 @@ public class Problem15 extends AbstractProblem {
   private List<Unit> goblins;
 
   /**
+   * A cached of currently occupied points (occupied by elves or goblins)
+   */
+  private Set<Point> occupiedPoints;
+
+  /**
    * A cache of adjacent points from a given point
    */
   private Map<Point, List<Point>> cachedAdjacentPoints;
@@ -161,7 +167,7 @@ public class Problem15 extends AbstractProblem {
         .collect(Collectors.toList());
 
     // Simulate each unit's turn
-    for (Unit unit : startingUnits) {
+    for (final var unit : startingUnits) {
       // Check if combat is over
       if (combatOver()) {
         return;
@@ -198,9 +204,6 @@ public class Problem15 extends AbstractProblem {
       enemies.addAll(elves);
     }
 
-    // Run Dijkstra's algorithm from our starting position
-    final var dijkstra = new Dijkstra(cave, elves, goblins, cachedAdjacentPoints, unit.position);
-
     // Get the reachable squares adjacent to our enemies.
     final var destinations = enemies.stream()
         .flatMap(enemy -> getReachableAdjacentPoints(enemy.position).stream())
@@ -210,6 +213,9 @@ public class Problem15 extends AbstractProblem {
     if (destinations.isEmpty()) {
       return;
     }
+
+    // Run Dijkstra's algorithm from our starting position
+    final var dijkstra = new Dijkstra(cave, occupiedPoints, unit.position);
 
     // Find our target destination from the destinations we found above
     final var destination = destinations.stream()
@@ -232,7 +238,10 @@ public class Problem15 extends AbstractProblem {
     shortestPath.removeFirst();
 
     // Move our unit into its new position
-    unit.position = shortestPath.removeFirst();
+    final var newPosition = shortestPath.removeFirst();
+    occupiedPoints.remove(unit.position);
+    unit.position = newPosition;
+    occupiedPoints.add(unit.position);
   }
 
   /**
@@ -276,6 +285,7 @@ public class Problem15 extends AbstractProblem {
     if (preferredEnemy.hitPoints <= 0) {
       elves.remove(preferredEnemy);
       goblins.remove(preferredEnemy);
+      occupiedPoints.remove(preferredEnemy.position);
     }
 
     return true;
@@ -286,17 +296,23 @@ public class Problem15 extends AbstractProblem {
    */
   private List<Point> getAdjacentPoints(@NotNull final Point point) {
     if (!cachedAdjacentPoints.containsKey(point)) {
-      final var adjacentPoints = Stream.of(
-          new Point(point.x - 1, point.y),
-          new Point(point.x + 1, point.y),
-          new Point(point.x, point.y - 1),
-          new Point(point.x, point.y + 1))
-          // Exclude points outside of the cave
-          .filter(p -> p.x >= 0 && p.x < cave.length)
-          .filter(p -> p.y >= 0 && p.y < cave[0].length)
-          // Exclude points which are walls
-          .filter(p -> cave[p.x][p.y] != '#')
-          .collect(Collectors.toList());
+      final var adjacentPoints = new ArrayList<Point>(4);
+      // Test if the point to the left is reachable
+      if (point.x - 1 >= 0 && cave[point.x - 1][point.y] != '#') {
+        adjacentPoints.add(new Point(point.x - 1, point.y));
+      }
+      // Test if the point to the right is reachable
+      if (point.x + 1 < cave.length && cave[point.x + 1][point.y] != '#') {
+        adjacentPoints.add( new Point(point.x + 1, point.y));
+      }
+      // Test if the point up is reachable
+      if (point.y - 1 >= 0 && cave[point.x][point.y - 1] != '#') {
+        adjacentPoints.add(new Point(point.x, point.y - 1));
+      }
+      // Test if the point down is reachable
+      if (point.y + 1 < cave[0].length && cave[point.x][point.y + 1] != '#') {
+        adjacentPoints.add(new Point(point.x, point.y + 1));
+      }
       cachedAdjacentPoints.put(point, adjacentPoints);
     }
     return cachedAdjacentPoints.get(point);
@@ -306,12 +322,13 @@ public class Problem15 extends AbstractProblem {
    * Returns all reachable points adjacent to the given point.
    */
   private List<Point> getReachableAdjacentPoints(@NotNull final Point point) {
-    return getAdjacentPoints(point).stream()
-        // Exclude points already occupied by elves
-        .filter(p -> elves.stream().noneMatch(elf -> p.x == elf.position.x && p.y == elf.position.y))
-        // Exclude points already occupied by goblins
-        .filter(p -> goblins.stream().noneMatch(goblin -> p.x == goblin.position.x && p.y == goblin.position.y))
-        .collect(Collectors.toList());
+    final var reachablePoints = new ArrayList<Point>(4);
+    for (final var p : getAdjacentPoints(point)) {
+      if (!occupiedPoints.contains(p)) {
+        reachablePoints.add(p);
+      }
+    }
+    return reachablePoints;
   }
 
   /**
@@ -338,14 +355,21 @@ public class Problem15 extends AbstractProblem {
     // Process elves and goblins
     elves = new ArrayList<>();
     goblins = new ArrayList<>();
+    occupiedPoints = new HashSet<>();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         switch (lines.get(y).charAt(x)) {
           case 'E':
-            elves.add(new Unit(new Point(x, y), elvenAttackPower));
+            final var elfLocation = new Point(x, y);
+            occupiedPoints.add(elfLocation);
+            final var elf = new Unit(elfLocation, elvenAttackPower);
+            elves.add(elf);
             break;
           case 'G':
-            goblins.add(new Unit(new Point(x, y)));
+            final var goblinLocation = new Point(x, y);
+            occupiedPoints.add(goblinLocation);
+            final var goblin = new Unit(goblinLocation);
+            goblins.add(goblin);
             break;
         }
       }
@@ -383,8 +407,7 @@ public class Problem15 extends AbstractProblem {
    */
   static class Dijkstra {
     private final char[][] cave;
-    private final List<Unit> elves;
-    private final List<Unit> goblins;
+    private final Set<Point> occupiedPoints;
     private final Map<Point, List<Point>> cachedAdjacentPoints;
 
     /**
@@ -400,12 +423,10 @@ public class Problem15 extends AbstractProblem {
     /**
      * Computes Dijkstra's algorithm from the giving starting point
      */
-    Dijkstra(@NotNull final char[][] cave, @NotNull final List<Unit> elves, @NotNull final List<Unit> goblins,
-        @NotNull final Map<Point, List<Point>> cachedAdjacentPoints, @NotNull final Point startingPoint) {
+    Dijkstra(@NotNull final char[][] cave, @NotNull final Set<Point> occupiedPoints, @NotNull final Point startingPoint) {
       this.cave = cave;
-      this.elves = elves;
-      this.goblins = goblins;
-      this.cachedAdjacentPoints = cachedAdjacentPoints;
+      this.occupiedPoints = occupiedPoints;
+      this.cachedAdjacentPoints = new HashMap<>();
 
       // Enumerate all the reachable vertices and initialize our distance function
       final var visited = new HashSet<Point>();
@@ -415,7 +436,9 @@ public class Problem15 extends AbstractProblem {
         final var p = stack.pop();
         if (visited.add(p)) {
           distanceTo.put(p, Integer.MAX_VALUE);
-          getReachableAdjacentEdges(p).forEach(stack::push);
+          for (final var adjacent : getReachableAdjacentEdges(p)) {
+            stack.push(adjacent);
+          }
         }
       }
       distanceTo.put(startingPoint, 0);
@@ -433,9 +456,9 @@ public class Problem15 extends AbstractProblem {
       while (!queue.isEmpty()) {
         final var point = queue.pollFirst();
         assert point != null;
-        getReachableAdjacentEdges(point).forEach(adjacent -> {
+        for (final var adjacent : getReachableAdjacentEdges(point)) {
           if (distanceTo.get(point) == Integer.MAX_VALUE) {
-            return;
+            break;
           }
           final var currentDistance = distanceTo.get(adjacent);
           final var proposedDistance = distanceTo.get(point) + 1;
@@ -447,9 +470,11 @@ public class Problem15 extends AbstractProblem {
           }
           // Tie-break equidistant points by their reading order
           if (proposedDistance == currentDistance) {
-            edgeTo.put(adjacent, Stream.of(point, edgeTo.get(adjacent)).min(POINT_READING_ORDER).orElseThrow());
+            if (POINT_READING_ORDER.compare(point, edgeTo.get(adjacent)) < 0) {
+              edgeTo.put(adjacent, point);
+            }
           }
-        });
+        }
       }
     }
 
@@ -485,30 +510,36 @@ public class Problem15 extends AbstractProblem {
      * Get all reachable adjacent edges from the given point
      */
     private List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
-      return getAdjacentPoints(point).stream()
-          // Exclude points already occupied by elves
-          .filter(p -> elves.stream().noneMatch(elf -> p.x == elf.position.x && p.y == elf.position.y))
-          // Exclude points already occupied by goblins
-          .filter(p -> goblins.stream().noneMatch(goblin -> p.x == goblin.position.x && p.y == goblin.position.y))
-          .collect(Collectors.toList());
-    }
-
-    /**
-     * Returns all points adjacent to the given point.
-     */
-    private List<Point> getAdjacentPoints(@NotNull final Point point) {
       if (!cachedAdjacentPoints.containsKey(point)) {
-        final var adjacentPoints = Stream.of(
-            new Point(point.x - 1, point.y),
-            new Point(point.x + 1, point.y),
-            new Point(point.x, point.y - 1),
-            new Point(point.x, point.y + 1))
-            // Exclude points outside of the cave
-            .filter(p -> p.x >= 0 && p.x < cave.length)
-            .filter(p -> p.y >= 0 && p.y < cave[0].length)
-            // Exclude points which are walls
-            .filter(p -> cave[p.x][p.y] != '#')
-            .collect(Collectors.toList());
+        final var adjacentPoints = new ArrayList<Point>(4);
+        // Add Point(point.x - 1, point.y)
+        if (point.x - 1 >= 0 && cave[point.x - 1][point.y] != '#') {
+          final var p = new Point(point.x - 1, point.y);
+          if (!occupiedPoints.contains(p)) {
+            adjacentPoints.add(p);
+          }
+        }
+        // Add Point(point.x + 1, point.y)
+        if (point.x + 1 < cave.length && cave[point.x + 1][point.y] != '#') {
+          final var p = new Point(point.x + 1, point.y);
+          if (!occupiedPoints.contains(p)) {
+            adjacentPoints.add(p);
+          }
+        }
+        // Add Point(point.x, point.y - 1)
+        if (point.y - 1 >= 0 && cave[point.x][point.y - 1] != '#') {
+          final var p = new Point(point.x, point.y - 1);
+          if (!occupiedPoints.contains(p)) {
+            adjacentPoints.add(p);
+          }
+        }
+        // Add Point(point.x, point.y + 1)
+        if (point.y + 1 < cave[0].length && cave[point.x][point.y + 1] != '#') {
+          final var p = new Point(point.x, point.y + 1);
+          if (!occupiedPoints.contains(p)) {
+            adjacentPoints.add(p);
+          }
+        }
         cachedAdjacentPoints.put(point, adjacentPoints);
       }
       return cachedAdjacentPoints.get(point);
