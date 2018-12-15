@@ -59,7 +59,7 @@ class PuzzleInputFetcher {
 
   private static String getSessionData() {
     try {
-      return Files.readString(Path.of("cookie.txt"));
+      return Files.readString(Path.of("cookie.txt")).trim();
     } catch (IOException e) {
       throw new RuntimeException("Couldn't get session data from cookie.txt");
     }
