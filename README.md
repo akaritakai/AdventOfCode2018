@@ -1,7 +1,7 @@
 # Advent Of Code 2018 Solutions
 
 [![Build Status](https://travis-ci.org/akaritakai/AdventOfCode2018.svg)](https://travis-ci.org/akaritakai/AdventOfCode2018)
-[![codecov](https://codecov.io/gh/akaritakai/AdventOfCode2018/branch/master/graph/badge.svg)](https://codecov.io/gh/akaritakai/AdventOfCode2018)
+[![Code Coverage](https://img.shields.io/codecov/c/github/akaritakai/AdventOfCode.svg)](https://codecov.io/gh/akaritakai/AdventOfCode2018)
 
 This repo contains my Advent Of Code 2018 (currently ongoing) solutions in Java 11.
 
