@@ -18,7 +18,7 @@ public class TestProblem07 extends BasePuzzleTest {
   ));
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem07();
     problem.setPuzzleInput(EXAMPLE_INPUT);
     Assert.assertEquals(problem.solvePart1(), "CABDFE");
@@ -32,7 +32,7 @@ public class TestProblem07 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem07();
     problem.setPuzzleInput(EXAMPLE_INPUT);
     Assert.assertEquals(problem.solvePart2(2, 0), "15");

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 public class TestProblem13 extends BasePuzzleTest {
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem13();
     problem.setPuzzleInput(String.join("\n", List.of(
         "/->-\\        ",
@@ -29,7 +29,7 @@ public class TestProblem13 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem13();
     problem.setPuzzleInput(String.join("\n", List.of(
         "/>-<\\  ",

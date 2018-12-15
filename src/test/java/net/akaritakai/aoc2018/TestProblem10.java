@@ -42,7 +42,7 @@ public class TestProblem10 extends BasePuzzleTest {
   ));
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem10();
     final var expectedOutput = String.join("\n", List.of("",
         "............",
@@ -82,7 +82,7 @@ public class TestProblem10 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem10();
     problem.setPuzzleInput(EXAMPLE_INPUT);
     Assert.assertEquals("3", problem.solvePart2());

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 public class TestProblem15 extends BasePuzzleTest {
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
@@ -20,6 +20,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart1(), "27730");
+  }
+
+  @Test
+  public void testProblemPart1Example2() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#G..#E#",
@@ -30,6 +35,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart1(), "36334");
+  }
+
+  @Test
+  public void testProblemPart1Example3() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#E..EG#",
@@ -40,6 +50,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart1(), "39514");
+  }
+
+  @Test
+  public void testProblemPart1Example4() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#E.G#.#",
@@ -50,6 +65,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart1(), "27755");
+  }
+
+  @Test
+  public void testProblemPart1Example5() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#.E...#",
@@ -60,6 +80,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart1(), "28944");
+  }
+
+  @Test
+  public void testProblemPart1Example6() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#########",
         "#G......#",
@@ -82,7 +107,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
@@ -94,6 +119,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart2(), "4988");
+  }
+
+  @Test
+  public void testProblemPart2Example2() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#E..EG#",
@@ -104,6 +134,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart2(), "31284");
+  }
+
+  @Test
+  public void testProblemPart2Example3() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#E.G#.#",
@@ -114,6 +149,10 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart2(), "3478");
+  }
+  @Test
+  public void testProblemPart2Example4() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#######",
         "#.E...#",
@@ -124,6 +163,11 @@ public class TestProblem15 extends BasePuzzleTest {
         "#######"
     )));
     Assert.assertEquals(problem.solvePart2(), "6474");
+  }
+
+  @Test
+  public void testProblemPart2Example5() {
+    final var problem = new Problem15();
     problem.setPuzzleInput(String.join("\n", List.of(
         "#########",
         "#G......#",

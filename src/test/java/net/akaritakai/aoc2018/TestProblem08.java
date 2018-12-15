@@ -9,7 +9,7 @@ public class TestProblem08 extends BasePuzzleTest {
   private static final String EXAMPLE_INPUT = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2";
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem08();
     problem.setPuzzleInput(EXAMPLE_INPUT);
     Assert.assertEquals(problem.solvePart1(), "138");
@@ -23,7 +23,7 @@ public class TestProblem08 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem08();
     problem.setPuzzleInput(EXAMPLE_INPUT);
     Assert.assertEquals(problem.solvePart2(), "66");

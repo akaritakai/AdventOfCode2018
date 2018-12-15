@@ -7,29 +7,27 @@ import org.testng.annotations.Test;
 
 public class TestProblem12 extends BasePuzzleTest {
 
-  private static final String EXAMPLE_INPUT = String.join("\n", List.of(
-      "initial state: #..#.#..##......###...###",
-      "",
-      "...## => #",
-      "..#.. => #",
-      ".#... => #",
-      ".#.#. => #",
-      ".#.## => #",
-      ".##.. => #",
-      ".#### => #",
-      "#.#.# => #",
-      "#.### => #",
-      "##.#. => #",
-      "##.## => #",
-      "###.. => #",
-      "###.# => #",
-      "####. => #"
-  ));
-
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem12();
-    problem.setPuzzleInput(EXAMPLE_INPUT);
+    problem.setPuzzleInput(String.join("\n", List.of(
+        "initial state: #..#.#..##......###...###",
+        "",
+        "...## => #",
+        "..#.. => #",
+        ".#... => #",
+        ".#.#. => #",
+        ".#.## => #",
+        ".##.. => #",
+        ".#### => #",
+        "#.#.# => #",
+        "#.### => #",
+        "##.#. => #",
+        "##.## => #",
+        "###.. => #",
+        "###.# => #",
+        "####. => #"
+    )));
     Assert.assertEquals(problem.solvePart1(), "325");
   }
 
@@ -38,12 +36,6 @@ public class TestProblem12 extends BasePuzzleTest {
     final var problem = new Problem12();
     problem.setPuzzleInput(getStoredInput(problem.getDay()));
     Assert.assertEquals(problem.solvePart1(), "1696");
-  }
-
-  @Test
-  @SuppressWarnings("EmptyMethod")
-  public void testProblemPart2Example() {
-    // No examples were given for Part 2
   }
 
   @Test

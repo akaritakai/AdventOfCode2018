@@ -14,10 +14,12 @@ application {
     mainClassName = "net.akaritakai.aoc2018.Main"
 }
 
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 test {
     useTestNG()
     testLogging {
-        events "passed", "skipped", "failed", "standardOut", "standardError"
+        events TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED
     }
 }
 

@@ -7,10 +7,15 @@ import org.testng.annotations.Test;
 public class TestProblem11 extends BasePuzzleTest {
 
   @Test
-  public void testProblemPart1Example() {
+  public void testProblemPart1Example1() {
     final var problem = new Problem11();
     problem.setPuzzleInput("18");
     Assert.assertEquals(problem.solvePart1(), "33,45");
+  }
+
+  @Test
+  public void testProblemPart1Example2() {
+    final var problem = new Problem11();
     problem.setPuzzleInput("42");
     Assert.assertEquals(problem.solvePart1(), "21,61");
   }
@@ -23,10 +28,15 @@ public class TestProblem11 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart2Example() {
+  public void testProblemPart2Example1() {
     final var problem = new Problem11();
     problem.setPuzzleInput("18");
     Assert.assertEquals(problem.solvePart2(), "90,269,16");
+  }
+
+  @Test
+  public void testProblemPart2Example2() {
+    final var problem = new Problem11();
     problem.setPuzzleInput("42");
     Assert.assertEquals(problem.solvePart2(), "232,251,12");
   }
