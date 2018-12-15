@@ -6,7 +6,7 @@
 
 This repo contains my Advent Of Code 2018 (currently ongoing) solutions in Java 11.
 
-##Providing Your Puzzle Input
+## Providing Your Puzzle Input
 
 There are two supported methods for inputting your puzzle data into this application.
 
