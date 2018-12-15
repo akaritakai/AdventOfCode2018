@@ -400,7 +400,6 @@ public class Problem15 extends AbstractProblem {
         final var p = stack.pop();
         if (visited.add(p)) {
           distanceTo.put(p, Integer.MAX_VALUE);
-          visited.add(p);
           getReachableAdjacentEdges(p).forEach(stack::push);
         }
       }
