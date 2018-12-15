@@ -22,6 +22,6 @@ repositories {
 
 dependencies {
     compile "org.jetbrains:annotations:+"
-    testCompile "com.google.guava:guava:+"
+    compile "com.google.guava:guava:+"
     testCompile "org.testng:testng:+"
 }

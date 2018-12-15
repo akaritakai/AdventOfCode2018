@@ -1,5 +1,29 @@
 package net.akaritakai.aoc2018;
 
+import com.google.common.collect.Lists;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
+
+
+@SuppressWarnings("Duplicates")
 public class Problem15 extends AbstractProblem {
   @Override
   public int getDay() {
@@ -8,11 +32,476 @@ public class Problem15 extends AbstractProblem {
 
   @Override
   public String solvePart1() {
-    return null; // This puzzle hasn't released yet
+    processInput(3);
+
+    // Simulate combat
+    while(!combatOver()) {
+      simulateRound();
+    }
+
+    return String.valueOf(getOutcome());
   }
 
   @Override
   public String solvePart2() {
-    return null; // This puzzle hasn't released yet
+    /*
+     * Unfortunately, checking to see if a particular elven attack power satisfies this problem is expensive.
+     * Thus, we should minimize the number of tests we need to do in order to find our answer.
+     *
+     * Our total search space is from 4 (our given minimum) to 200 (at which elves one-shot goblins) since there is no
+     * benefit to survivability once they are that powerful.
+     *
+     * We will use binary search to aggressively check our search space, and we will do so in parallel for an extra
+     * boost.
+     */
+    final var powers = IntStream.rangeClosed(4, 200).boxed().collect(Collectors.toList());
+
+    int minSuccessPower = Integer.MAX_VALUE;
+    int maxFailedPower = Integer.MIN_VALUE;
+
+    final var numCores = Runtime.getRuntime().availableProcessors();
+
+    final var outcomes = new ConcurrentHashMap<>();
+    final var successes = new ConcurrentLinkedQueue<Integer>();
+    final var failures = new ConcurrentLinkedQueue<Integer>();
+    final var removals = new ConcurrentLinkedQueue<Predicate<Integer>>();
+
+    while (maxFailedPower + 1 != minSuccessPower) {
+      if (minSuccessPower == 4 && powers.size() == 1 && powers.get(0) == 4) {
+        break; // Edge case where we never observe a failure (the answer is 4)
+      }
+      // Parallelize the search
+      Lists.partition(powers, (powers.size() / numCores) + 1).parallelStream().forEach(searchSpace -> {
+        // Pick the midpoint of our assigned search space
+        final var power = searchSpace.get(searchSpace.size() / 2);
+
+        if (outcomes.containsKey(power)) {
+          return; // Skip if we've already tested this
+        }
+
+        // Test it
+        final var problem = new Problem15();
+        problem.setPuzzleInput(getPuzzleInput());
+        problem.processInput(power);
+        final var numElves = problem.elves.size();
+        while (!problem.combatOver()) {
+          problem.simulateRound();
+        }
+
+        if (problem.elves.size() == numElves) {
+          // Elves survived
+          successes.add(power);
+          outcomes.put(power, problem.getOutcome());
+          removals.add(i -> i > power);
+        } else {
+          // Elves did not survive
+          failures.add(power);
+          removals.add(i -> i < power);
+        }
+      });
+
+      // Aggregate the parallelized search results
+      removals.forEach(powers::removeIf);
+      while (!successes.isEmpty()) {
+        minSuccessPower = Math.min(minSuccessPower, successes.poll());
+      }
+      while (!failures.isEmpty()) {
+        maxFailedPower = Math.max(maxFailedPower, failures.poll());
+      }
+    }
+
+    return String.valueOf(outcomes.get(minSuccessPower));
   }
+
+  /**
+   * Checks if combat is over. Happens when either all the elves or all the goblins have been slain
+   */
+  private boolean combatOver() {
+    return elves.isEmpty() || goblins.isEmpty();
+  }
+
+  /**
+   * Gets the outcome of the combat
+   */
+  private int getOutcome() {
+    final var totalHp = Stream.of(elves, goblins).flatMap(Collection::stream).mapToInt(unit -> unit.hitPoints).sum();
+    return rounds * totalHp;
+  }
+
+  /**
+   * How many rounds of combat we have seen so far
+   */
+  private int rounds;
+
+  /**
+   * The cave's layout
+   */
+  private char[][] cave;
+
+  /**
+   * The list of alive elves
+   */
+  private List<Unit> elves;
+
+  /**
+   * The list of alive goblins
+   */
+  private List<Unit> goblins;
+
+  /**
+   * Simulates a round of combat.
+   */
+  private void simulateRound() {
+    // Get all the units that are alive at the start of the round
+    final var startingUnits = Stream.of(elves, goblins)
+        .flatMap(Collection::stream)
+        .sorted(UNIT_READING_ORDER)
+        .collect(Collectors.toList());
+
+    // Simulate each unit's turn
+    for (Unit unit : startingUnits) {
+      // Check if combat is over
+      if (combatOver()) {
+        return;
+      }
+
+      // Check if the unit is alive
+      if (!elves.contains(unit) && !goblins.contains(unit)) {
+        continue;
+      }
+
+      // Try to see if there's someone next to us that we can attack
+      if (attack(unit)) {
+        continue; // We successfully attacked
+      }
+
+      // If there's no one we could attack, we have to move so that we are within attack range and then attack
+      move(unit);
+      attack(unit);
+    }
+
+    rounds++; // We completed the round without combat ending
+  }
+
+  /**
+   * Moves the unit according to its movement rules.
+   */
+  private void move(@NotNull final Unit unit) {
+    // Get our list of enemies
+    final var enemies = new ArrayList<Unit>();
+    if (elves.contains(unit)) {
+      enemies.addAll(goblins);
+    }
+    if (goblins.contains(unit)) {
+      enemies.addAll(elves);
+    }
+
+    // Run Dijkstra's algorithm from our starting position
+    final var dijkstra = new Dijkstra(cave, elves, goblins, unit.position);
+
+    // Get the reachable squares adjacent to our enemies.
+    final var destinations = enemies.stream()
+        .flatMap(enemy -> getReachableAdjacentPoints(enemy.position).stream())
+        .collect(Collectors.toList());
+
+    // If we have nowhere to go, then don't move anywhere
+    if (destinations.isEmpty()) {
+      return;
+    }
+
+    // Find our target destination from the destinations we found above
+    final var destination = destinations.stream()
+        // Group destinations by how close they are
+        .collect(Collectors.groupingBy(dijkstra::getDistance, Collectors.toList())).entrySet().stream()
+        // Get destinations which are the closest
+        .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
+        // Tie-break using reading order
+        .min(POINT_READING_ORDER).orElseThrow();
+
+    // Check if our destination is reachable
+    if (dijkstra.unreachable(destination)) {
+      return;
+    }
+
+    // Get the shortest path
+    final var shortestPath = dijkstra.getShortestPath(destination);
+
+    // The first point on the path should be our current position
+    shortestPath.removeFirst();
+
+    // Move our unit into its new position
+    unit.position = shortestPath.removeFirst();
+  }
+
+  /**
+   * Causes the unit to attack according to its attack rules.
+   * Returns true if it successfully attacked another unit.
+   */
+  private boolean attack(@NotNull final Unit unit) {
+    // Get our list of enemies
+    final var enemies = new ArrayList<Unit>();
+    if (elves.contains(unit)) {
+      enemies.addAll(goblins);
+    }
+    if (goblins.contains(unit)) {
+      enemies.addAll(elves);
+    }
+
+    // Find if any of our enemies are adjacent to us
+    final var adjacentEnemies = enemies.stream()
+        .filter(enemy -> getAdjacentPoints(unit.position)
+            .stream()
+            .anyMatch(point -> enemy.position.x == point.x && enemy.position.y == point.y))
+        .collect(Collectors.toList());
+
+    if (adjacentEnemies.isEmpty()) {
+      return false; // There are no enemies adjacent to us to attack
+    }
+
+    // Find the enemy with the fewest hit points
+    final var preferredEnemy = adjacentEnemies.stream()
+        // Group enemies by their hit points
+        .collect(Collectors.groupingBy(enemy -> enemy.hitPoints, Collectors.toList())).entrySet().stream()
+        // Get enemies who have the fewest hit points
+        .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
+        // Tie-break using reading order
+        .min(UNIT_READING_ORDER).orElseThrow();
+
+    // Attack!
+    preferredEnemy.hitPoints -= unit.attackPower;
+
+    // Check for and resolve enemy deaths
+    if (preferredEnemy.hitPoints <= 0) {
+      elves.remove(preferredEnemy);
+      goblins.remove(preferredEnemy);
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns all points adjacent to the given point.
+   */
+  private List<Point> getAdjacentPoints(@NotNull final Point point) {
+    return Stream.of(new Point(point.x - 1, point.y),
+                     new Point(point.x + 1, point.y),
+                     new Point(point.x, point.y - 1),
+                     new Point(point.x, point.y + 1))
+        // Exclude points outside of the cave
+        .filter(p -> p.x >= 0 && p.x < cave.length)
+        .filter(p -> p.y >= 0 && p.y < cave[0].length)
+        // Exclude points which are walls
+        .filter(p -> cave[p.x][p.y] != '#')
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns all reachable points adjacent to the given point.
+   */
+  private List<Point> getReachableAdjacentPoints(@NotNull final Point point) {
+    return getAdjacentPoints(point).stream()
+        // Exclude points already occupied by elves
+        .filter(p -> elves.stream().noneMatch(elf -> p.x == elf.position.x && p.y == elf.position.y))
+        // Exclude points already occupied by goblins
+        .filter(p -> goblins.stream().noneMatch(goblin -> p.x == goblin.position.x && p.y == goblin.position.y))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Processes the input given the provided elven attack power.
+   */
+  private void processInput(final int elvenAttackPower) {
+    final var lines = getPuzzleInput().lines().collect(Collectors.toList());
+
+    final var width = lines.stream().mapToInt(String::length).max().orElseThrow();
+    final var height = lines.size();
+
+    // Process cave structure
+    cave = new char[width][height];
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        if (lines.get(y).charAt(x) == '#') {
+          cave[x][y] = '#';
+        } else {
+          cave[x][y] = '.';
+        }
+      }
+    }
+
+    // Process elves and goblins
+    elves = new ArrayList<>();
+    goblins = new ArrayList<>();
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        switch (lines.get(y).charAt(x)) {
+          case 'E':
+            elves.add(new Unit(new Point(x, y), elvenAttackPower));
+            break;
+          case 'G':
+            goblins.add(new Unit(new Point(x, y)));
+            break;
+        }
+      }
+    }
+
+    // Initialize the number of rounds
+    rounds = 0;
+  }
+
+  /**
+   * Unit defines an elf or goblin with a given position, hit points, and attack power.
+   */
+  static class Unit {
+    private static final int GOBLIN_ATTACK_POWER = 3;
+
+    Point position;
+    int hitPoints = 200;
+    final int attackPower;
+
+    Unit(Point position) {
+      this(position, GOBLIN_ATTACK_POWER);
+    }
+
+    Unit(Point position, int attackPower) {
+      this.position = position;
+      this.attackPower = attackPower;
+    }
+  }
+
+  /**
+   * Class used for determining the ideal route between two points in the cave.
+   */
+  static class Dijkstra {
+    private final char[][] cave;
+    private final List<Unit> elves;
+    private final List<Unit> goblins;
+
+    /**
+     * Distance from starting point -> key point
+     */
+    private final Map<Point, Integer> distanceTo = new HashMap<>();
+
+    /**
+     * Last edge on the path from starting point -> key point
+     */
+    private final Map<Point, Point> edgeTo = new HashMap<>();
+
+    /**
+     * Computes Dijkstra's algorithm from the giving starting point
+     */
+    Dijkstra(@NotNull final char[][] cave, @NotNull final List<Unit> elves, @NotNull final List<Unit> goblins,
+        @NotNull final Point startingPoint) {
+      this.cave = cave;
+      this.elves = elves;
+      this.goblins = goblins;
+
+      // Enumerate all the reachable vertices and initialize our distance function
+      final var visited = new HashSet<Point>();
+      final var stack = new Stack<Point>();
+      stack.push(startingPoint);
+      while (!stack.isEmpty()) {
+        final var p = stack.pop();
+        if (visited.add(p)) {
+          distanceTo.put(p, Integer.MAX_VALUE);
+          visited.add(p);
+          getReachableAdjacentEdges(p).forEach(stack::push);
+        }
+      }
+      distanceTo.put(startingPoint, 0);
+
+      // Define the processing order for points in the queue
+      final var comparator = Comparator
+          // Points are compared by distance from our starting point
+          .comparingInt((ToIntFunction<Point>) distanceTo::get)
+          // Then compared by their reading order
+          .thenComparing(POINT_READING_ORDER);
+
+      // Run Dijkstra's algorithm
+      final var queue = new TreeSet<>(comparator);
+      queue.addAll(visited);
+      while (!queue.isEmpty()) {
+        final var point = queue.pollFirst();
+        assert point != null;
+        getReachableAdjacentEdges(point).forEach(adjacent -> {
+          if (distanceTo.get(point) == Integer.MAX_VALUE) {
+            return;
+          }
+          final var currentDistance = distanceTo.get(adjacent);
+          final var proposedDistance = distanceTo.get(point) + 1;
+          if (proposedDistance < currentDistance) {
+            distanceTo.put(adjacent, proposedDistance);
+            edgeTo.put(adjacent, point);
+            queue.remove(adjacent);
+            queue.add(adjacent);
+          }
+          // Tie-break equidistant points by their reading order
+          if (proposedDistance == currentDistance) {
+            edgeTo.put(adjacent, Stream.of(point, edgeTo.get(adjacent)).min(POINT_READING_ORDER).orElseThrow());
+          }
+        });
+      }
+    }
+
+    /**
+     * Gets the shortest distance from the starting point to the provided point
+     */
+    int getDistance(@NotNull final Point point) {
+      return distanceTo.getOrDefault(point, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Returns true if the point is unreachable from the starting point, and false otherwise
+     */
+    boolean unreachable(@NotNull final Point point) {
+      return !distanceTo.containsKey(point);
+    }
+
+    /**
+     * Gets the shortest path from the starting point to the destination
+     */
+    LinkedList<Point> getShortestPath(@NotNull final Point point) {
+      final var path = new LinkedList<Point>();
+      if (unreachable(point)) {
+        return path;
+      }
+      for (var p = point; p != null; p = edgeTo.get(p)) {
+        path.addFirst(p);
+      }
+      return path;
+    }
+
+    /**
+     * Get all reachable adjacent edges from the given point
+     */
+    private List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
+      return Stream.of(new Point(point.x - 1, point.y),
+                       new Point(point.x + 1, point.y),
+                       new Point(point.x, point.y - 1),
+                       new Point(point.x, point.y + 1))
+          // Exclude points outside of the cave
+          .filter(p -> p.x >= 0 && p.x < cave.length)
+          .filter(p -> p.y >= 0 && p.y < cave[0].length)
+          // Exclude points which are walls
+          .filter(p -> cave[p.x][p.y] != '#')
+          // Exclude points already occupied by elves
+          .filter(p -> elves.stream().noneMatch(elf -> p.x == elf.position.x && p.y == elf.position.y))
+          // Exclude points already occupied by goblins
+          .filter(p -> goblins.stream().noneMatch(goblin -> p.x == goblin.position.x && p.y == goblin.position.y))
+          .collect(Collectors.toList());
+    }
+  }
+
+  /**
+   * Compares points by their reading order.
+   */
+  private static final Comparator<Point> POINT_READING_ORDER = Comparator
+      .comparingInt((Point point) -> point.y)
+      .thenComparingInt(point -> point.x);
+
+  /**
+   * Compares units by their reading order.
+   */
+  private static final Comparator<Unit> UNIT_READING_ORDER = Comparator
+      .comparingInt((Unit unit) -> unit.position.y)
+      .thenComparingInt(unit -> unit.position.x);
 }
