@@ -3,11 +3,18 @@ plugins {
     id 'application'
 }
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
-mainClassName = "net.akaritakai.aoc2018.Main"
-sourceSets.main.java.srcDirs = ['src']
+application {
+    mainClassName = "net.akaritakai.aoc2018.Main"
+}
+
+test {
+    useTestNG()
+}
 
 repositories {
     mavenCentral()
@@ -15,4 +22,6 @@ repositories {
 
 dependencies {
     compile "org.jetbrains:annotations:+"
+    testCompile "com.google.guava:guava:+"
+    testCompile "org.testng:testng:+"
 }
