@@ -146,6 +146,11 @@ public class Problem15 extends AbstractProblem {
   private List<Unit> goblins;
 
   /**
+   * A cache of adjacent points from a given point
+   */
+  private Map<Point, List<Point>> cachedAdjacentPoints;
+
+  /**
    * Simulates a round of combat.
    */
   private void simulateRound() {
@@ -194,7 +199,7 @@ public class Problem15 extends AbstractProblem {
     }
 
     // Run Dijkstra's algorithm from our starting position
-    final var dijkstra = new Dijkstra(cave, elves, goblins, unit.position);
+    final var dijkstra = new Dijkstra(cave, elves, goblins, cachedAdjacentPoints, unit.position);
 
     // Get the reachable squares adjacent to our enemies.
     final var destinations = enemies.stream()
@@ -280,16 +285,21 @@ public class Problem15 extends AbstractProblem {
    * Returns all points adjacent to the given point.
    */
   private List<Point> getAdjacentPoints(@NotNull final Point point) {
-    return Stream.of(new Point(point.x - 1, point.y),
-                     new Point(point.x + 1, point.y),
-                     new Point(point.x, point.y - 1),
-                     new Point(point.x, point.y + 1))
-        // Exclude points outside of the cave
-        .filter(p -> p.x >= 0 && p.x < cave.length)
-        .filter(p -> p.y >= 0 && p.y < cave[0].length)
-        // Exclude points which are walls
-        .filter(p -> cave[p.x][p.y] != '#')
-        .collect(Collectors.toList());
+    if (!cachedAdjacentPoints.containsKey(point)) {
+      final var adjacentPoints = Stream.of(
+          new Point(point.x - 1, point.y),
+          new Point(point.x + 1, point.y),
+          new Point(point.x, point.y - 1),
+          new Point(point.x, point.y + 1))
+          // Exclude points outside of the cave
+          .filter(p -> p.x >= 0 && p.x < cave.length)
+          .filter(p -> p.y >= 0 && p.y < cave[0].length)
+          // Exclude points which are walls
+          .filter(p -> cave[p.x][p.y] != '#')
+          .collect(Collectors.toList());
+      cachedAdjacentPoints.put(point, adjacentPoints);
+    }
+    return cachedAdjacentPoints.get(point);
   }
 
   /**
@@ -343,6 +353,9 @@ public class Problem15 extends AbstractProblem {
 
     // Initialize the number of rounds
     rounds = 0;
+
+    // Initialize a cache for adjacent points
+    cachedAdjacentPoints = new ConcurrentHashMap<>();
   }
 
   /**
@@ -372,6 +385,7 @@ public class Problem15 extends AbstractProblem {
     private final char[][] cave;
     private final List<Unit> elves;
     private final List<Unit> goblins;
+    private final Map<Point, List<Point>> cachedAdjacentPoints;
 
     /**
      * Distance from starting point -> key point
@@ -387,10 +401,11 @@ public class Problem15 extends AbstractProblem {
      * Computes Dijkstra's algorithm from the giving starting point
      */
     Dijkstra(@NotNull final char[][] cave, @NotNull final List<Unit> elves, @NotNull final List<Unit> goblins,
-        @NotNull final Point startingPoint) {
+        @NotNull final Map<Point, List<Point>> cachedAdjacentPoints, @NotNull final Point startingPoint) {
       this.cave = cave;
       this.elves = elves;
       this.goblins = goblins;
+      this.cachedAdjacentPoints = cachedAdjacentPoints;
 
       // Enumerate all the reachable vertices and initialize our distance function
       final var visited = new HashSet<Point>();
@@ -470,20 +485,33 @@ public class Problem15 extends AbstractProblem {
      * Get all reachable adjacent edges from the given point
      */
     private List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
-      return Stream.of(new Point(point.x - 1, point.y),
-                       new Point(point.x + 1, point.y),
-                       new Point(point.x, point.y - 1),
-                       new Point(point.x, point.y + 1))
-          // Exclude points outside of the cave
-          .filter(p -> p.x >= 0 && p.x < cave.length)
-          .filter(p -> p.y >= 0 && p.y < cave[0].length)
-          // Exclude points which are walls
-          .filter(p -> cave[p.x][p.y] != '#')
+      return getAdjacentPoints(point).stream()
           // Exclude points already occupied by elves
           .filter(p -> elves.stream().noneMatch(elf -> p.x == elf.position.x && p.y == elf.position.y))
           // Exclude points already occupied by goblins
           .filter(p -> goblins.stream().noneMatch(goblin -> p.x == goblin.position.x && p.y == goblin.position.y))
           .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all points adjacent to the given point.
+     */
+    private List<Point> getAdjacentPoints(@NotNull final Point point) {
+      if (!cachedAdjacentPoints.containsKey(point)) {
+        final var adjacentPoints = Stream.of(
+            new Point(point.x - 1, point.y),
+            new Point(point.x + 1, point.y),
+            new Point(point.x, point.y - 1),
+            new Point(point.x, point.y + 1))
+            // Exclude points outside of the cave
+            .filter(p -> p.x >= 0 && p.x < cave.length)
+            .filter(p -> p.y >= 0 && p.y < cave[0].length)
+            // Exclude points which are walls
+            .filter(p -> cave[p.x][p.y] != '#')
+            .collect(Collectors.toList());
+        cachedAdjacentPoints.put(point, adjacentPoints);
+      }
+      return cachedAdjacentPoints.get(point);
     }
   }
 
