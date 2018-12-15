@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 
+@SuppressWarnings("Duplicates")
 public class Problem13 extends AbstractProblem {
   @Override
   public int getDay() {
