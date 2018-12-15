@@ -3,3 +3,4 @@ jdk:
   - openjdk11
 script: ./gradlew check
 install: ./gradlew assemble
+after_success: ./gradlew jacocoTestReport coveralls
