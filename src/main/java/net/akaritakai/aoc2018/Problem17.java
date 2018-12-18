@@ -29,6 +29,13 @@ public class Problem17 extends AbstractProblem {
     return String.valueOf(settled.size());
   }
 
+  // sciyoshi (https://github.com/sciyoshi) came up with this extremely elegant recursion on the subreddit.
+  // I had a recursive solution as well, but it was nowhere as nice.
+  // This is a translation of their solution in Python to Java 11.
+  //
+  // It's worth noting that it's not an exact copy. When I had read their solution, they had a subtle bug where the
+  // assumption was that at least some clay veins always started at y = 1. That was not true for my puzzle input,
+  // and this edge case is called out explicitly in the puzzle instructions.
   private boolean fill(@NotNull final Point point, @NotNull final Direction direction) {
     flowing.add(point);
 

@@ -3,7 +3,6 @@ package net.akaritakai.aoc2018;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -24,38 +23,42 @@ public class Problem18 extends AbstractProblem {
       iterate();
     }
 
-    final var trees = Arrays.stream(acres).flatMap(Arrays::stream).filter(c -> c == '|').count();
-    final var lumberyards = Arrays.stream(acres).flatMap(Arrays::stream).filter(c -> c == '#').count();
-
-    return String.valueOf(trees * lumberyards);
+    return String.valueOf(getResourceValue());
   }
 
   @Override
   public String solvePart2() {
+    /*
+     * This is another Game of Life-like problem (like Problem 12). It seems everyone's inputs converge to a
+     * repeating set of inputs within ~1000 evolutions.
+     */
+
     processInput();
 
     final var previous = new ArrayList<>();
     final var seen = new HashMap<>();
 
     for (var i = 0; i < 1_000_000_000; i++) {
-      final var acreString = Arrays.stream(acres)
-          .flatMap(Arrays::stream)
-          .map(String::valueOf)
-          .collect(Collectors.joining());
-      previous.add(acreString);
-      if (seen.containsKey(acreString)) {
+      final var acres = serialize();
+      previous.add(acres);
+      if (seen.containsKey(acres)) {
         break;
       }
-      seen.put(acreString, score());
+      seen.put(acres, getResourceValue());
       iterate();
+    }
+
+    // If there truly were no repeats, then just output the getResourceValue we found at this point.
+    if (seen.size() == 1_000_000_000) {
+      return String.valueOf(getResourceValue());
     }
 
     var start = 0;
     var period = 0;
-    final var lastAcre = previous.get(previous.size() - 1);
+    final var last = previous.get(previous.size() - 1);
     for (var i = previous.size() - 2; i >= 0; i--) {
       final var acre = previous.get(i);
-      if (Objects.equals(lastAcre, acre)) {
+      if (Objects.equals(last, acre)) {
         start = i;
         period = (previous.size() - 1) - (i);
         break;
@@ -63,24 +66,48 @@ public class Problem18 extends AbstractProblem {
     }
 
     final var offset = (1_000_000_000 - start) % period;
-    final var score = seen.get(previous.get(start + offset));
+    final var value = seen.get(previous.get(start + offset));
 
-    return String.valueOf(score);
+    return String.valueOf(value);
   }
 
-  private long score() {
-    final var trees = Arrays.stream(acres).flatMap(Arrays::stream).filter(c -> c == '|').count();
-    final var lumberyards = Arrays.stream(acres).flatMap(Arrays::stream).filter(c -> c == '#').count();
+  /**
+   * Serializes the grid into a String format.
+   */
+  private String serialize() {
+    final var sb = new StringBuilder();
+    for (char[] acre : acres) {
+        sb.append(acre);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Gets the resource value of the lumber collection area.
+   */
+  private long getResourceValue() {
+    int trees = 0;
+    int lumberyards = 0;
+    for (char[] acre : acres) {
+      for (int i = 0; i < acres[0].length; i++) {
+        switch (acre[i]) {
+          case '|': trees++; break;
+          case '#': lumberyards++; break;
+        }
+      }
+    }
     return trees * lumberyards;
   }
 
+  /**
+   * Evolves the lumber collection area based on our rules.
+   */
   private void iterate() {
-    final var oldAcres = Arrays.stream(acres).map(Character[]::clone).toArray(Character[][]::new);
+    final var oldAcres = Arrays.stream(acres).map(char[]::clone).toArray(char[][]::new);
     for (var x = 0; x < acres.length; x++) {
       for (var y = 0; y < acres[0].length; y++) {
-        final var neighborhood = getNeighborhood(oldAcres, x, y);
-        final var treeCount = neighborhood.stream().filter(a -> a == '|').count();
-        final var lumberyardCount = neighborhood.stream().filter(a -> a == '#').count();
+        final var treeCount = getNeighboringTreeCount(oldAcres, x, y);
+        final var lumberyardCount = getNeighboringLumberyardCount(oldAcres, x, y);
         switch (acres[x][y]) {
           case '.':
             if (treeCount >= 3) acres[x][y] = '|';
@@ -96,8 +123,8 @@ public class Problem18 extends AbstractProblem {
     }
   }
 
-  private List<Character> getNeighborhood(@NotNull final Character[][] acres, final int x, final int y) {
-    final var neighborhood = new ArrayList<Character>();
+  private int getNeighboringTreeCount(@NotNull final char[][] acres, final int x, final int y) {
+    int count = 0;
     for (var i = x - 1; i <= x + 1; i++) {
       for (var j = y - 1; j <= y + 1; j++) {
         if (i == x && j == y) {
@@ -106,13 +133,33 @@ public class Problem18 extends AbstractProblem {
         if (i < 0 || i >= acres.length || j < 0 || j >= acres[0].length) {
           continue; // out of bounds
         }
-        neighborhood.add(acres[i][j]);
+        if (acres[i][j] == '|') {
+          count++;
+        }
       }
     }
-    return neighborhood;
+    return count;
   }
 
-  private Character[][] acres;
+  private int getNeighboringLumberyardCount(@NotNull final char[][] acres, final int x, final int y) {
+    int count = 0;
+    for (var i = x - 1; i <= x + 1; i++) {
+      for (var j = y - 1; j <= y + 1; j++) {
+        if (i == x && j == y) {
+          continue; // skip ourself
+        }
+        if (i < 0 || i >= acres.length || j < 0 || j >= acres[0].length) {
+          continue; // out of bounds
+        }
+        if (acres[i][j] == '#') {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  private char[][] acres;
 
   private void processInput() {
     final var lines = getPuzzleInput().lines()
@@ -123,7 +170,7 @@ public class Problem18 extends AbstractProblem {
     final var width = lines.stream().mapToInt(String::length).max().orElseThrow();
     final var height = lines.size();
 
-    acres = new Character[width][height];
+    acres = new char[width][height];
 
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
