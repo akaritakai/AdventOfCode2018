@@ -395,7 +395,7 @@ public class Problem15 extends AbstractProblem {
     /**
      * Calculates the best move to make to reach the given enemies
      */
-    Optional<Point> calculateMove(final List<Unit> enemies) {
+    Optional<Point> calculateMove(@NotNull final List<Unit> enemies) {
       final var dijkstra = new DijkstraShortestPath<>(graph);
       final var paths = new HashMap<Point, SingleSourcePaths<Point, DefaultEdge>>();
 
