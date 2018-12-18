@@ -512,28 +512,28 @@ public class Problem15 extends AbstractProblem {
     private List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
       if (!cachedAdjacentPoints.containsKey(point)) {
         final var adjacentPoints = new ArrayList<Point>(4);
-        // Add Point(point.x - 1, point.y)
+        // Test if the point to the left is reachable
         if (point.x - 1 >= 0 && cave[point.x - 1][point.y] != '#') {
           final var p = new Point(point.x - 1, point.y);
           if (!occupiedPoints.contains(p)) {
             adjacentPoints.add(p);
           }
         }
-        // Add Point(point.x + 1, point.y)
+        // Test if the point to the right is reachable
         if (point.x + 1 < cave.length && cave[point.x + 1][point.y] != '#') {
           final var p = new Point(point.x + 1, point.y);
           if (!occupiedPoints.contains(p)) {
             adjacentPoints.add(p);
           }
         }
-        // Add Point(point.x, point.y - 1)
+        // Test if the point above is reachable
         if (point.y - 1 >= 0 && cave[point.x][point.y - 1] != '#') {
           final var p = new Point(point.x, point.y - 1);
           if (!occupiedPoints.contains(p)) {
             adjacentPoints.add(p);
           }
         }
-        // Add Point(point.x, point.y + 1)
+        // Test if the point below is reachable
         if (point.y + 1 < cave[0].length && cave[point.x][point.y + 1] != '#') {
           final var p = new Point(point.x, point.y + 1);
           if (!occupiedPoints.contains(p)) {
