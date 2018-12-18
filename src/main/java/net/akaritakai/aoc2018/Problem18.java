@@ -53,14 +53,13 @@ public class Problem18 extends AbstractProblem {
       return String.valueOf(getResourceValue());
     }
 
+    // Find the start of our repeats and its period
     var start = 0;
     var period = 0;
-    final var last = previous.get(previous.size() - 1);
     for (var i = previous.size() - 2; i >= 0; i--) {
-      final var acre = previous.get(i);
-      if (Objects.equals(last, acre)) {
+      if (Objects.equals(previous.get(previous.size() - 1), previous.get(i))) {
         start = i;
-        period = (previous.size() - 1) - (i);
+        period = (previous.size() - 1) - i;
         break;
       }
     }
