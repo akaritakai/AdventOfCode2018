@@ -35,17 +35,17 @@ public class Problem17 extends AbstractProblem {
   private boolean fill(@NotNull final Point point, @NotNull final Direction direction) {
     flowing.add(point);
 
-    final var below = new Point(point.x, point.y + 1);
+    final var down = DOWN.of(point);
 
-    if (!clay.contains(below) && !flowing.contains(below) && below.y <= maxY) {
-      fill(below, DOWN);
+    if (!clay.contains(down) && !flowing.contains(down) && down.y <= maxY) {
+      fill(down, DOWN);
     }
-    if (!clay.contains(below) && !settled.contains(below)) {
+    if (!clay.contains(down) && !settled.contains(down)) {
       return false;
     }
 
-    var left = new Point(point.x - 1, point.y);
-    var right = new Point(point.x + 1, point.y);
+    var left = LEFT.of(point);
+    var right = RIGHT.of(point);
 
     final var leftFilled = clay.contains(left) || !flowing.contains(left) && fill(left, LEFT);
     final var rightFilled = clay.contains(right) || !flowing.contains(right) && fill(right, RIGHT);
@@ -54,11 +54,11 @@ public class Problem17 extends AbstractProblem {
       settled.add(point);
       while (flowing.contains(left)) {
         settled.add(left);
-        left = new Point(left.x - 1, left.y);
+        left = LEFT.of(left);
       }
       while (flowing.contains(right)) {
         settled.add(right);
-        right = new Point(right.x + 1, right.y);
+        right = RIGHT.of(right);
       }
     }
 
@@ -123,6 +123,10 @@ public class Problem17 extends AbstractProblem {
     Direction(final int dx, final int dy) {
       this.dx = dx;
       this.dy = dy;
+    }
+
+    Point of(final Point p) {
+      return new Point(p.x + dx, p.y + dy);
     }
   }
 }
