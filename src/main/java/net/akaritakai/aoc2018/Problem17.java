@@ -107,7 +107,7 @@ public class Problem17 extends AbstractProblem {
     // Fill in the grid
     fill(new Point(500, 0), DOWN);
 
-    // Remove any point that is below our minY (points above maxY are automatically excluded bv fill)
+    // Remove any point that is below our minY (points above maxY are automatically excluded by fill)
     flowing.removeIf(p -> p.y < minY);
     settled.removeIf(p -> p.y < minY);
   }

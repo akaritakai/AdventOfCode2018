@@ -173,8 +173,7 @@ public class Problem18 extends AbstractProblem {
 
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
-        char c = lines.get(y).charAt(x);
-        acres[x][y] = c;
+        acres[x][y] = lines.get(y).charAt(x);
       }
     }
   }
