@@ -29,6 +29,7 @@ repositories {
 dependencies {
     compile "org.jetbrains:annotations:16.0.3"
     compile "com.google.guava:guava:27.0.1-jre"
+    compile "org.jgrapht:jgrapht-core:+"
     testCompile "org.testng:testng:6.14.3"
 }
 

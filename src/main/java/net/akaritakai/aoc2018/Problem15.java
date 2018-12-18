@@ -2,26 +2,20 @@ package net.akaritakai.aoc2018;
 
 import com.google.common.collect.Lists;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 
 
 @SuppressWarnings("Duplicates")
@@ -204,44 +198,12 @@ public class Problem15 extends AbstractProblem {
       enemies.addAll(elves);
     }
 
-    // Get the reachable squares adjacent to our enemies.
-    final var destinations = enemies.stream()
-        .flatMap(enemy -> getReachableAdjacentPoints(enemy.position).stream())
-        .collect(Collectors.toList());
-
-    // If we have nowhere to go, then don't move anywhere
-    if (destinations.isEmpty()) {
-      return;
-    }
-
-    // Run Dijkstra's algorithm from our starting position
-    final var dijkstra = new Dijkstra(cave, occupiedPoints, unit.position);
-
-    // Find our target destination from the destinations we found above
-    final var destination = destinations.stream()
-        // Group destinations by how close they are
-        .collect(Collectors.groupingBy(dijkstra::getDistance, Collectors.toList())).entrySet().stream()
-        // Get destinations which are the closest
-        .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
-        // Tie-break using reading order
-        .min(POINT_READING_ORDER).orElseThrow();
-
-    // Check if our destination is reachable
-    if (dijkstra.unreachable(destination)) {
-      return;
-    }
-
-    // Get the shortest path
-    final var shortestPath = dijkstra.getShortestPath(destination);
-
-    // The first point on the path should be our current position
-    shortestPath.removeFirst();
-
-    // Move our unit into its new position
-    final var newPosition = shortestPath.removeFirst();
-    occupiedPoints.remove(unit.position);
-    unit.position = newPosition;
-    occupiedPoints.add(unit.position);
+    final var pathFinder = new PathFinder(cave, occupiedPoints, unit.position);
+    pathFinder.calculateMove(enemies).ifPresent(newPosition -> {
+      occupiedPoints.remove(unit.position);
+      unit.position = newPosition;
+      occupiedPoints.add(unit.position);
+    });
   }
 
   /**
@@ -319,19 +281,6 @@ public class Problem15 extends AbstractProblem {
   }
 
   /**
-   * Returns all reachable points adjacent to the given point.
-   */
-  private List<Point> getReachableAdjacentPoints(@NotNull final Point point) {
-    final var reachablePoints = new ArrayList<Point>(4);
-    for (final var p : getAdjacentPoints(point)) {
-      if (!occupiedPoints.contains(p)) {
-        reachablePoints.add(p);
-      }
-    }
-    return reachablePoints;
-  }
-
-  /**
    * Processes the input given the provided elven attack power.
    */
   private void processInput(final int elvenAttackPower) {
@@ -405,112 +354,80 @@ public class Problem15 extends AbstractProblem {
   /**
    * Class used for determining the ideal route between two points in the cave.
    */
-  static class Dijkstra {
+  static class PathFinder {
     private final char[][] cave;
     private final Set<Point> occupiedPoints;
-    private final Map<Point, List<Point>> cachedAdjacentPoints;
+    private final Graph<Point, DefaultEdge> graph;
+    private final Point startingPoint;
 
-    /**
-     * Distance from starting point -> key point
-     */
-    private final Map<Point, Integer> distanceTo = new HashMap<>();
-
-    /**
-     * Last edge on the path from starting point -> key point
-     */
-    private final Map<Point, Point> edgeTo = new HashMap<>();
-
-    /**
-     * Computes Dijkstra's algorithm from the giving starting point
-     */
-    Dijkstra(@NotNull final char[][] cave, @NotNull final Set<Point> occupiedPoints, @NotNull final Point startingPoint) {
+    PathFinder(@NotNull final char[][] cave, @NotNull final Set<Point> occupiedPoints, @NotNull final Point startingPoint) {
       this.cave = cave;
       this.occupiedPoints = occupiedPoints;
-      this.cachedAdjacentPoints = new HashMap<>();
+      this.startingPoint = startingPoint;
 
-      // Enumerate all the reachable vertices and initialize our distance function
+      // Build the graph
+      graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       final var visited = new HashSet<Point>();
       final var stack = new Stack<Point>();
       stack.push(startingPoint);
       while (!stack.isEmpty()) {
         final var p = stack.pop();
         if (visited.add(p)) {
-          distanceTo.put(p, Integer.MAX_VALUE);
+          graph.addVertex(p);
           for (final var adjacent : getReachableAdjacentEdges(p)) {
+            graph.addVertex(adjacent);
+            graph.addEdge(p, adjacent);
             stack.push(adjacent);
           }
         }
       }
-      distanceTo.put(startingPoint, 0);
-
-      // Define the processing order for points in the queue
-      final var comparator = Comparator
-          // Points are compared by distance from our starting point
-          .comparingInt((ToIntFunction<Point>) distanceTo::get)
-          // Then compared by their reading order
-          .thenComparing(POINT_READING_ORDER);
-
-      // Run Dijkstra's algorithm
-      final var queue = new TreeSet<>(comparator);
-      queue.addAll(visited);
-      while (!queue.isEmpty()) {
-        final var point = queue.pollFirst();
-        assert point != null;
-        for (final var adjacent : getReachableAdjacentEdges(point)) {
-          if (distanceTo.get(point) == Integer.MAX_VALUE) {
-            break;
-          }
-          final var currentDistance = distanceTo.get(adjacent);
-          final var proposedDistance = distanceTo.get(point) + 1;
-          if (proposedDistance < currentDistance) {
-            distanceTo.put(adjacent, proposedDistance);
-            edgeTo.put(adjacent, point);
-            queue.remove(adjacent);
-            queue.add(adjacent);
-          }
-          // Tie-break equidistant points by their reading order
-          if (proposedDistance == currentDistance) {
-            if (POINT_READING_ORDER.compare(point, edgeTo.get(adjacent)) < 0) {
-              edgeTo.put(adjacent, point);
-            }
-          }
-        }
-      }
     }
 
     /**
-     * Gets the shortest distance from the starting point to the provided point
+     * Gets the neighbors around a point
      */
-    int getDistance(@NotNull final Point point) {
-      return distanceTo.getOrDefault(point, Integer.MAX_VALUE);
-    }
+    final Function<Point, Stream<Point>> neighbors = p -> Stream.of(
+            new Point(p.x - 1, p.y),
+            new Point(p.x + 1, p.y),
+            new Point(p.x, p.y - 1),
+            new Point(p.x, p.y + 1));
 
     /**
-     * Returns true if the point is unreachable from the starting point, and false otherwise
+     * Calculates the best move to make to reach the given enemies
      */
-    boolean unreachable(@NotNull final Point point) {
-      return !distanceTo.containsKey(point);
-    }
+    Optional<Point> calculateMove(final List<Unit> enemies) {
+      final var dijkstra = new DijkstraShortestPath<>(graph);
+      final var paths = new HashMap<Point, SingleSourcePaths<Point, DefaultEdge>>();
 
-    /**
-     * Gets the shortest path from the starting point to the destination
-     */
-    LinkedList<Point> getShortestPath(@NotNull final Point point) {
-      final var path = new LinkedList<Point>();
-      if (unreachable(point)) {
-        return path;
-      }
-      for (var p = point; p != null; p = edgeTo.get(p)) {
-        path.addFirst(p);
-      }
-      return path;
+      // Get the points surrounding enemies
+      return enemies.stream().map(enemy -> enemy.position).flatMap(neighbors)
+              // Remove any unreachable points
+              .filter(graph::containsVertex)
+              .filter(point -> paths.computeIfAbsent(startingPoint, s -> dijkstra.getPaths(startingPoint)).getPath(point) != null)
+              // Collect the points into a distance map
+              .collect(Collectors.groupingBy(point -> paths.get(startingPoint).getPath(point).getLength(), Collectors.toList())).entrySet().stream()
+              // Get the points that have the shortest distance
+              .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
+              // Tie-break points by reading order
+              .min(POINT_READING_ORDER)
+              .map(destination ->
+                      // Get the points surrounding the starting point
+                      Stream.of(startingPoint).flatMap(neighbors)
+                              // Remove any unreachable points
+                              .filter(graph::containsVertex)
+                              .filter(point -> paths.computeIfAbsent(point, s -> dijkstra.getPaths(point)).getPath(destination) != null)
+                              // Collect the points into a map of how fast they are
+                              .collect(Collectors.groupingBy(point -> paths.get(point).getPath(destination).getLength(), Collectors.toList())).entrySet().stream()
+                              // Get the points that get to our destination the fastest
+                              .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
+                              // Tie-break points by reading order
+                              .min(POINT_READING_ORDER).orElseThrow());
     }
 
     /**
      * Get all reachable adjacent edges from the given point
      */
-    private List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
-      if (!cachedAdjacentPoints.containsKey(point)) {
+    List<Point> getReachableAdjacentEdges(@NotNull final Point point) {
         final var adjacentPoints = new ArrayList<Point>(4);
         // Test if the point to the left is reachable
         if (point.x - 1 >= 0 && cave[point.x - 1][point.y] != '#') {
@@ -540,9 +457,7 @@ public class Problem15 extends AbstractProblem {
             adjacentPoints.add(p);
           }
         }
-        cachedAdjacentPoints.put(point, adjacentPoints);
-      }
-      return cachedAdjacentPoints.get(point);
+        return adjacentPoints;
     }
   }
 
