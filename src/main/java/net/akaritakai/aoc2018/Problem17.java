@@ -34,7 +34,7 @@ public class Problem17 extends AbstractProblem {
 
     final var below = new Point(point.x, point.y + 1);
 
-    if (!clay.contains(below) && !flowing.contains(below) && 1 <= below.y && below.y <= maxY) {
+    if (!clay.contains(below) && !flowing.contains(below) && below.y <= maxY) {
       fill(below, DOWN);
     }
     if (!clay.contains(below) && !settled.contains(below)) {
