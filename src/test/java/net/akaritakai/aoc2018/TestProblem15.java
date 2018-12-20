@@ -100,7 +100,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other1() {
+  public void testProblemPart1Other01() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a70kfe/day_15_part_1_not_working/
     // It seems to contain a very tricky situation for movement.
@@ -142,7 +142,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other2() {
+  public void testProblemPart1Other02() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6iymj/day_15_frustrating/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -183,7 +183,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other3() {
+  public void testProblemPart1Other03() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6dp5v/2018_day_15_part1_cant_get_the_right_answer/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -224,7 +224,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other4() {
+  public void testProblemPart1Other04() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6dp5v/2018_day_15_part1_cant_get_the_right_answer/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -265,7 +265,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other5() {
+  public void testProblemPart1Other05() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6rhzw/help_need_help_with_day_15_part_1/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -307,7 +307,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other6() {
+  public void testProblemPart1Other06() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6yleq/2018_day_15_part_2_my_solution_seems_to_work_for/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -348,7 +348,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other7() {
+  public void testProblemPart1Other07() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6g4nf/day_15_solution_produces_same_answer_as_two/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -390,7 +390,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other8() {
+  public void testProblemPart1Other08() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6g4nf/day_15_solution_produces_same_answer_as_two/
     problem.setPuzzleInput(String.join("\n", List.of(
@@ -432,7 +432,7 @@ public class TestProblem15 extends BasePuzzleTest {
   }
 
   @Test
-  public void testProblemPart1Other9() {
+  public void testProblemPart1Other09() {
     final var problem = new Problem15();
     // This input came from https://www.reddit.com/r/adventofcode/comments/a6jb8n/day_15_part_1python_3_get_correct_answer_for/
     problem.setPuzzleInput(String.join("\n", List.of(

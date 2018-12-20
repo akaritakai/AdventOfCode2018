@@ -397,7 +397,7 @@ public class Problem15 extends AbstractProblem {
      */
     Optional<Point> calculateMove(@NotNull final List<Unit> enemies) {
       final var dijkstra = new DijkstraShortestPath<>(graph);
-      final var paths = new HashMap<Point, SingleSourcePaths<Point, DefaultEdge>>();
+      final var paths = new ConcurrentHashMap<Point, SingleSourcePaths<Point, DefaultEdge>>();
 
       // Get the points surrounding enemies
       return enemies.stream().map(enemy -> enemy.position).flatMap(neighbors)
@@ -412,12 +412,12 @@ public class Problem15 extends AbstractProblem {
               .min(POINT_READING_ORDER)
               .map(destination ->
                       // Get the points surrounding the starting point
-                      Stream.of(startingPoint).flatMap(neighbors)
+                      neighbors.apply(startingPoint)
                               // Remove any unreachable points
                               .filter(graph::containsVertex)
-                              .filter(point -> paths.computeIfAbsent(point, s -> dijkstra.getPaths(point)).getPath(destination) != null)
+                              .filter(point -> paths.computeIfAbsent(destination, s -> dijkstra.getPaths(destination)).getPath(point) != null)
                               // Collect the points into a map of how fast they are
-                              .collect(Collectors.groupingBy(point -> paths.get(point).getPath(destination).getLength(), Collectors.toList())).entrySet().stream()
+                              .collect(Collectors.groupingBy(point -> paths.get(destination).getPath(point).getLength(), Collectors.toList())).entrySet().stream()
                               // Get the points that get to our destination the fastest
                               .min(Comparator.comparingInt(Map.Entry::getKey)).map(Map.Entry::getValue).orElse(Collections.emptyList()).stream()
                               // Tie-break points by reading order
