@@ -9,6 +9,7 @@ gradle-app.setting
 .idea
 *.iws
 *.iml
+*.ipr
 out/
 
 # Project specific
